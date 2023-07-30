@@ -7,6 +7,10 @@ public class RayActivationController : MonoBehaviour
     public Transform attachPoint; // The point where the sphere should attach.
     public LayerMask raycastMask; // The layers that the raycast can hit.
 
+    public GameObject activatorObject; // Assign your activator object here from Inspector.
+
+    public RayProcessingController rayProcessingController; // The controller that will perform actions when the ray hits.
+
     private XRGrabInteractable _grabInteractable;
     private Rigidbody _grabInteractableRb;
 
@@ -34,7 +38,7 @@ public class RayActivationController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Activator"))
+        if (other.gameObject == activatorObject)
         {
             _isActivated = true;
             _grabInteractableRb = other.gameObject.GetComponent<Rigidbody>();
@@ -45,10 +49,11 @@ public class RayActivationController : MonoBehaviour
 
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.CompareTag("Activator"))
+        if (other.gameObject == activatorObject)
         {
             _isActivated = false;
             _grabInteractableRb.isKinematic = false;
+            rayProcessingController.ResetRayHit(rayProcessingController.rayReceiver);
         }
     }
 
@@ -74,10 +79,9 @@ public class RayActivationController : MonoBehaviour
             _lineRenderer.SetPosition(0, raycastOrigin.position);
             _lineRenderer.SetPosition(1, hit.point);
 
-            if (hit.transform.CompareTag("Exit")) // Check if the hit object has the "Exit" tag.
+            if (hit.transform.gameObject == rayProcessingController.rayReceiver)
             {
-                TransparencyController transparencyController = hit.transform.GetComponent<TransparencyController>();
-                transparencyController.SetTransparent(true); // Make the object transparent.
+                rayProcessingController.ProcessRayHit(hit.transform.gameObject);
             }
         }
         else

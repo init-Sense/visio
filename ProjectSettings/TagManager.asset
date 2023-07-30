@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Activator
   - Exit
+  - RayInterceptor
+  - RayInterceptorColumn
   layers:
   - Default
   - TransparentFX
