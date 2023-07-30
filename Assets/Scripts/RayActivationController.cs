@@ -3,13 +3,13 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class RayActivationController : MonoBehaviour
 {
-    public Transform raycastOrigin; // The point from where the ray should be cast.
-    public Transform attachPoint; // The point where the sphere should attach.
-    public LayerMask raycastMask; // The layers that the raycast can hit.
+    public Transform raycastOrigin;
+    public Transform attachPoint;
+    public LayerMask raycastMask;
 
-    public GameObject activatorObject; // Assign your activator object here from Inspector.
+    public GameObject activatorObject;
 
-    public RayProcessingController rayProcessingController; // The controller that will perform actions when the ray hits.
+    public RayProcessingController rayProcessingController;
 
     private XRGrabInteractable _grabInteractable;
     private Rigidbody _grabInteractableRb;
