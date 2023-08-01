@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -9,7 +10,7 @@ public class RayActivationController : MonoBehaviour
 
     public GameObject activatorObject;
 
-    public RayProcessingController rayProcessingController;
+    public List<RayProcessingController> rayProcessingControllers;
 
     private XRGrabInteractable _grabInteractable;
     private Rigidbody _grabInteractableRb;
@@ -53,9 +54,14 @@ public class RayActivationController : MonoBehaviour
         {
             _isActivated = false;
             _grabInteractableRb.isKinematic = false;
-            rayProcessingController.ResetRayHit(rayProcessingController.rayReceiver);
+
+            foreach (RayProcessingController controller in rayProcessingControllers)
+            {
+                controller.ResetRayHit(controller.rayReceiver);
+            }
         }
     }
+
 
     void Update()
     {
@@ -79,17 +85,28 @@ public class RayActivationController : MonoBehaviour
             _lineRenderer.SetPosition(0, raycastOrigin.position);
             _lineRenderer.SetPosition(1, hit.point);
 
-            if (hit.transform.gameObject == rayProcessingController.rayReceiver)
+            foreach (RayProcessingController controller in rayProcessingControllers)
             {
-                rayProcessingController.ProcessRayHit(hit.transform.gameObject);
+                if (hit.transform.gameObject == controller.rayReceiver)
+                {
+                    controller.ProcessRayHit(hit.point, ray, hit.normal);  // pass the hit point
+                }
             }
         }
         else
         {
             _lineRenderer.SetPosition(0, raycastOrigin.position);
             _lineRenderer.SetPosition(1, raycastOrigin.position + raycastOrigin.forward * 1000);
+        
+            foreach (RayProcessingController controller in rayProcessingControllers)
+            {
+                controller.ResetRayHit(controller.rayReceiver);
+            }
         }
 
         _lineRenderer.enabled = true;
     }
+
+
+
 }
