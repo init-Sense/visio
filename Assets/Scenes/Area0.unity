@@ -271,8 +271,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1421655159}
     - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
-      propertyPath: rayProcessingControllers.Array.size
+      propertyPath: raycastOrigins.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
+      propertyPath: raycastOrigins.Array.data[0]
+      value: 
+      objectReference: {fileID: 1429207017}
+    - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
+      propertyPath: raycastOrigins.Array.data[1]
+      value: 
+      objectReference: {fileID: 924305634}
+    - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
+      propertyPath: rayProcessingControllers.Array.size
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: rayProcessingControllers.Array.data[0]
@@ -282,6 +294,10 @@ PrefabInstance:
       propertyPath: rayProcessingControllers.Array.data[1]
       value: 
       objectReference: {fileID: 1421655159}
+    - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
+      propertyPath: rayProcessingControllers.Array.data[2]
+      value: 
+      objectReference: {fileID: 1558059610}
     - target: {fileID: 565961043240915449, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: activatorObject
       value: 
@@ -364,7 +380,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 4256920342094688915, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 924305634}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3483620982617303081, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       insertIndex: -1
@@ -565,6 +584,37 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
+--- !u!1 &924305633
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 924305634}
+  m_Layer: 0
+  m_Name: Ray Caster (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &924305634
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 924305633}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0.00000023841858, z: -0.111}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1739657154}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &966628408
 GameObject:
   m_ObjectHideFlags: 0
@@ -734,6 +784,11 @@ MonoBehaviour:
   rayReceiver: {fileID: 1421655154}
   rayReceiverReflectsRays: 1
   reflectedRayLength: 100000
+--- !u!4 &1429207017 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7446891724305210093, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
+  m_PrefabInstance: {fileID: 614421660}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1479925825 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b8d767658c865d24c9bc4549ec02f11f, type: 3}
@@ -837,7 +892,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1558059608}
   m_LocalRotation: {x: 0, y: -0.11849062, z: 0, w: 0.9929552}
-  m_LocalPosition: {x: 2.263, y: 1.861, z: 0.292}
+  m_LocalPosition: {x: 2.173, y: 1.861, z: 0.663}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1177,6 +1232,11 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!4 &1739657154 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4256920342094688915, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
+  m_PrefabInstance: {fileID: 614421660}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1815318735
 GameObject:
   m_ObjectHideFlags: 0

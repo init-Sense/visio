@@ -1,14 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 public class RayProcessingController : MonoBehaviour
 {
-    [System.Serializable]
+    [Serializable]
     public class ActionableObject
     {
-        public GameObject TargetObject;
-        public Action ActionToPerform;
-        public bool CanReflectRay; // New field
+        public GameObject targetObject;
+        public Action actionToPerform;
+        public bool canReflectRay;
     }
 
     public enum Action
@@ -18,97 +20,109 @@ public class RayProcessingController : MonoBehaviour
     }
 
     public List<ActionableObject> actionObjects = new List<ActionableObject>();
-    public GameObject rayReceiver; // The GameObject that can receive rays.
-    public bool rayReceiverReflectsRays; // New field indicating if the rayReceiver should reflect rays.
-
+    public Dictionary<int, List<LineRenderer>> reflectedRayRenderers = new Dictionary<int, List<LineRenderer>>();
+    public GameObject rayReceiver;
+    public bool rayReceiverReflectsRays;
     public float reflectedRayLength = 1000f;
-    private LineRenderer reflectedRayRenderer; // LineRenderer to visualize the reflected ray.
 
-    void Start()
+    public int maxReflectionCount = 5; // Defines the max depth for recursive reflections
+
+    private LineRenderer CreateNewLineRendererForRay(int rayIndex)
     {
-        // Initialize LineRenderer
-        reflectedRayRenderer = gameObject.AddComponent<LineRenderer>();
-        reflectedRayRenderer.material = new Material(Shader.Find("Standard"));
-        reflectedRayRenderer.startColor = Color.blue;
-        reflectedRayRenderer.endColor = Color.blue;
-        reflectedRayRenderer.startWidth = 0.01f;
-        reflectedRayRenderer.endWidth = 0.01f;
-        reflectedRayRenderer.positionCount = 2;
-        reflectedRayRenderer.enabled = false;
+        LineRenderer newRenderer = new GameObject("Reflected Ray Renderer " + rayIndex).AddComponent<LineRenderer>();
+        newRenderer.transform.parent = this.transform;
+        newRenderer.material = new Material(Shader.Find("Standard"));
+        newRenderer.startColor = Color.blue;
+        newRenderer.endColor = Color.blue;
+        newRenderer.startWidth = 0.01f;
+        newRenderer.endWidth = 0.01f;
+        newRenderer.positionCount = 2;
+        newRenderer.enabled = false;
+
+        if (!reflectedRayRenderers.ContainsKey(rayIndex))
+        {
+            reflectedRayRenderers[rayIndex] = new List<LineRenderer>();
+        }
+
+        reflectedRayRenderers[rayIndex].Add(newRenderer);
+
+        return newRenderer;
     }
 
-    public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 hitNormal,
-        int depth = 10) // Added depth parameter
+    public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 hitNormal, int rayIndex = 0)
     {
         foreach (ActionableObject actionObject in actionObjects)
         {
             PerformAction(actionObject, incomingRay);
         }
 
-        // If rayReceiver should reflect rays, reflect the incoming ray.
-        if (rayReceiverReflectsRays && depth > 0) // Check depth here
+        // If rayReceiver should reflect rays, reflect the incoming ray
+        if (rayReceiverReflectsRays)
         {
-            Ray reflectedRay =
-                new Ray(hitPoint, Vector3.Reflect(incomingRay.direction, hitNormal)); // Use the hit point
+            RecursiveRaycast(hitPoint, incomingRay, hitNormal, rayIndex, 0);
+        }
+    }
 
-            RaycastHit reflectedHit;
-            if (Physics.Raycast(reflectedRay, out reflectedHit, reflectedRayLength))
+    private void RecursiveRaycast(Vector3 hitPoint, Ray incomingRay, Vector3 hitNormal, int rayIndex,
+        int currentReflectionCount)
+    {
+        Ray reflectedRay = new Ray(hitPoint, Vector3.Reflect(incomingRay.direction, hitNormal));
+
+        RaycastHit reflectedHit;
+
+        LineRenderer currentRayRenderer = CreateNewLineRendererForRay(rayIndex);
+
+        if (Physics.Raycast(reflectedRay, out reflectedHit, reflectedRayLength))
+        {
+            // If reflected ray hits something
+            currentRayRenderer.SetPosition(0, reflectedRay.origin);
+            currentRayRenderer.SetPosition(1, reflectedHit.point);
+
+            Debug.Log("Reflected ray hit " + reflectedHit.transform.gameObject.name);
+
+            // Check if the hit object has a RayProcessingController component and allows reflections, and if we're under the maximum reflection count
+            RayProcessingController hitObjectRPC =
+                reflectedHit.transform.gameObject.GetComponent<RayProcessingController>();
+            if (hitObjectRPC != null && hitObjectRPC.rayReceiverReflectsRays &&
+                currentReflectionCount < maxReflectionCount)
             {
-                // If reflected ray hits something
-                reflectedRayRenderer.SetPosition(0, reflectedRay.origin);
-                reflectedRayRenderer.SetPosition(1, reflectedHit.point);
-
-                Debug.Log("Reflected ray hit " + reflectedHit.transform.gameObject.name);
-
-                // If the hit object has the RayProcessingController script, call its ProcessRayHit method.
-                RayProcessingController hitScript =
-                    reflectedHit.transform.gameObject.GetComponent<RayProcessingController>();
-                if (hitScript != null)
-                {
-                    Vector3 reflectedHitNormal = reflectedHit.normal;
-                    hitScript.ProcessRayHit(reflectedHit.point, reflectedRay, reflectedHitNormal,
-                        depth - 1); // Decrement depth here
-                }
+                // Call RecursiveRaycast again, but increment the current reflection count and ray index
+                RecursiveRaycast(reflectedHit.point, reflectedRay, reflectedHit.normal, rayIndex + 1,
+                    currentReflectionCount + 1);
             }
-            else
-            {
-                // If reflected ray doesn't hit anything, just draw in direction of reflection
-                reflectedRayRenderer.SetPosition(0, reflectedRay.origin);
-                reflectedRayRenderer.SetPosition(1, reflectedRay.origin + reflectedRay.direction * reflectedRayLength);
-
-                Debug.Log("Reflected ray didn't hit anything");
-            }
-
-            reflectedRayRenderer.enabled = true;
         }
         else
         {
-            reflectedRayRenderer.enabled = false;
+            // If reflected ray doesn't hit anything, just draw in direction of reflection
+            currentRayRenderer.SetPosition(0, reflectedRay.origin);
+            currentRayRenderer.SetPosition(1, reflectedRay.origin + reflectedRay.direction * reflectedRayLength);
 
-            Debug.Log("Ray receiver doesn't reflect rays or maximum reflection depth reached");
+            Debug.Log("Reflected ray didn't hit anything");
         }
+
+        currentRayRenderer.enabled = true;
     }
 
 
     private void PerformAction(ActionableObject actionObject, Ray incomingRay) // Updated
     {
-        switch (actionObject.ActionToPerform)
+        switch (actionObject.actionToPerform)
         {
             case Action.SetMaterial:
-                actionObject.TargetObject.GetComponent<Renderer>().material.color = Color.red;
+                actionObject.targetObject.GetComponent<Renderer>().material.color = Color.red;
                 break;
 
             case Action.RemoveGameObject:
-                Destroy(actionObject.TargetObject);
+                Destroy(actionObject.targetObject);
                 break;
         }
 
         // If the object can reflect the ray, do it here
-        if (actionObject.CanReflectRay)
+        if (actionObject.canReflectRay)
         {
             // Reflect the ray. 
             // Note that this assumes the rayReceiver is a flat surface facing upwards.
-            Ray reflectedRay = new Ray(actionObject.TargetObject.transform.position,
+            Ray reflectedRay = new Ray(actionObject.targetObject.transform.position,
                 Vector3.Reflect(incomingRay.direction, Vector3.up));
 
             // Here you can use the reflectedRay for other processing
@@ -122,16 +136,19 @@ public class RayProcessingController : MonoBehaviour
         {
             foreach (ActionableObject actionObject in actionObjects)
             {
-                if (actionObject.ActionToPerform == Action.SetMaterial)
+                if (actionObject.actionToPerform == Action.SetMaterial)
                 {
-                    actionObject.TargetObject.GetComponent<Renderer>().material.color = Color.white;
+                    actionObject.targetObject.GetComponent<Renderer>().material.color = Color.white;
                 }
             }
 
-            // Check if LineRenderer is not null before trying to access it.
-            if (reflectedRayRenderer != null)
+            // Disable all reflected ray LineRenderers
+            foreach (var rayRenderers in reflectedRayRenderers)
             {
-                reflectedRayRenderer.enabled = false; // disable the reflected ray LineRenderer
+                foreach (LineRenderer lineRenderer in rayRenderers.Value)
+                {
+                    lineRenderer.enabled = false;
+                }
             }
         }
     }
