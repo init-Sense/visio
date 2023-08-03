@@ -58,7 +58,21 @@ public class RayActivationController : MonoBehaviour
 
             foreach (RayProcessingController controller in rayProcessingControllers)
             {
-                controller.ResetRayHit(controller.rayReceiver);
+                if (controller.rayReceiver != null) // Check if rayReceiver is not null
+                {
+                    controller.ResetRayHit(controller.rayReceiver);
+                }
+            }
+        }
+        else
+        {
+            foreach (RayProcessingController controller in rayProcessingControllers)
+            {
+                if (other.gameObject == controller.rayReceiver &&
+                    controller.rayReceiver != null) // Check if rayReceiver is not null
+                {
+                    controller.ResetRayHit(controller.rayReceiver);
+                }
             }
         }
     }
@@ -114,5 +128,4 @@ public class RayActivationController : MonoBehaviour
 
         lineRenderer.enabled = true;
     }
-
 }

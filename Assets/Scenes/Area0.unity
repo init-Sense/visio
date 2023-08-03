@@ -123,6 +123,129 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &233333388
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 233333389}
+  - component: {fileID: 233333393}
+  - component: {fileID: 233333392}
+  - component: {fileID: 233333391}
+  - component: {fileID: 233333390}
+  m_Layer: 6
+  m_Name: Cube (2)
+  m_TagString: RayInterceptor
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &233333389
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233333388}
+  m_LocalRotation: {x: 0, y: -0.11849062, z: 0, w: 0.9929552}
+  m_LocalPosition: {x: -1.022, y: 1.861, z: 3.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 966628409}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: -13.61, z: 0}
+--- !u!114 &233333390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233333388}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7101bff06f54a8097f0f12f05698f29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actionObjects: []
+  rayReceiver: {fileID: 233333388}
+  rayReceiverReflectsRays: 1
+  reflectedRayLength: 100000
+  maxReflectionCount: 5
+--- !u!65 &233333391
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233333388}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!23 &233333392
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233333388}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &233333393
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 233333388}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &371031782
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -284,7 +407,7 @@ PrefabInstance:
       objectReference: {fileID: 924305634}
     - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: rayProcessingControllers.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: rayProcessingControllers.Array.data[0]
@@ -298,6 +421,10 @@ PrefabInstance:
       propertyPath: rayProcessingControllers.Array.data[2]
       value: 
       objectReference: {fileID: 1558059610}
+    - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
+      propertyPath: rayProcessingControllers.Array.data[3]
+      value: 
+      objectReference: {fileID: 233333390}
     - target: {fileID: 565961043240915449, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: activatorObject
       value: 
@@ -649,6 +776,7 @@ Transform:
   - {fileID: 986458564}
   - {fileID: 1421655155}
   - {fileID: 1558059609}
+  - {fileID: 233333389}
   m_Father: {fileID: 2022638539}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -712,7 +840,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -784,6 +912,7 @@ MonoBehaviour:
   rayReceiver: {fileID: 1421655154}
   rayReceiverReflectsRays: 1
   reflectedRayLength: 100000
+  maxReflectionCount: 5
 --- !u!4 &1429207017 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7446891724305210093, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
@@ -892,7 +1021,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1558059608}
   m_LocalRotation: {x: 0, y: -0.11849062, z: 0, w: 0.9929552}
-  m_LocalPosition: {x: 2.173, y: 1.861, z: 0.663}
+  m_LocalPosition: {x: 1.824, y: 1.861, z: 0.989}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -915,6 +1044,7 @@ MonoBehaviour:
   rayReceiver: {fileID: 1558059608}
   rayReceiverReflectsRays: 1
   reflectedRayLength: 100000
+  maxReflectionCount: 5
 --- !u!65 &1558059611
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -930,7 +1060,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

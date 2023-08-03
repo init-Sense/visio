@@ -26,6 +26,9 @@ public class RayProcessingController : MonoBehaviour
     public float reflectedRayLength = 1000f;
 
     public int maxReflectionCount = 5; // Defines the max depth for recursive reflections
+    
+    private bool _isProcessingRay = false; // Flag to indicate if a ray is currently being processed
+
 
     private LineRenderer CreateNewLineRendererForRay(int rayIndex)
     {
@@ -51,6 +54,11 @@ public class RayProcessingController : MonoBehaviour
 
     public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 hitNormal, int rayIndex = 0)
     {
+        // If a ray is currently being processed, return early
+        if (_isProcessingRay) return;
+
+        _isProcessingRay = true;
+
         foreach (ActionableObject actionObject in actionObjects)
         {
             PerformAction(actionObject, incomingRay);
@@ -61,6 +69,8 @@ public class RayProcessingController : MonoBehaviour
         {
             RecursiveRaycast(hitPoint, incomingRay, hitNormal, rayIndex, 0);
         }
+
+        _isProcessingRay = false;
     }
 
     private void RecursiveRaycast(Vector3 hitPoint, Ray incomingRay, Vector3 hitNormal, int rayIndex,
@@ -131,7 +141,14 @@ public class RayProcessingController : MonoBehaviour
 
     public void ResetRayHit(GameObject hitObject)
     {
-        // Check if the hit object is the ray receiver.
+        if (hitObject == null) return;
+
+        // Check if a ray is currently being processed, if so, return early
+        if (_isProcessingRay) return;
+
+        _isProcessingRay = true;
+
+        // Check if the hitObject is the ray receiver.
         if (hitObject == rayReceiver)
         {
             foreach (ActionableObject actionObject in actionObjects)
@@ -142,14 +159,24 @@ public class RayProcessingController : MonoBehaviour
                 }
             }
 
-            // Disable all reflected ray LineRenderers
+            // Disable and destroy all reflected ray LineRenderers
             foreach (var rayRenderers in reflectedRayRenderers)
             {
                 foreach (LineRenderer lineRenderer in rayRenderers.Value)
                 {
-                    lineRenderer.enabled = false;
+                    if(lineRenderer != null)
+                    {
+                        lineRenderer.enabled = false;
+                        Destroy(lineRenderer.gameObject);
+                    }
                 }
             }
+
+            // Clear the lists of LineRenderers.
+            reflectedRayRenderers.Clear();
         }
+
+        _isProcessingRay = false;
     }
+
 }
