@@ -98,7 +98,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actionObjects: []
-  rayReceivers: []
+  rayReceiver: {fileID: 6081788262177093316}
+  rayReceiverReflectsRays: 0
+  reflectedRayLength: 1000
+  maxReflectionCount: 5
 --- !u!1 &6081788262177093316
 GameObject:
   m_ObjectHideFlags: 0
