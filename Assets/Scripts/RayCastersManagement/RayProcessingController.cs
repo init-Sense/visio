@@ -9,27 +9,23 @@ public class RayProcessingController : MonoBehaviour
     public class ActionableObject
     {
         public GameObject targetObject;
-        public Action actionToPerform;
+        public ActionBase actionHandler;
         public bool canReflectRay;
     }
-
-    public enum Action
-    {
-        SetMaterial,
-        RemoveGameObject
-    }
-
-    public List<ActionableObject> actionObjects = new List<ActionableObject>();
+    
     public Dictionary<int, List<LineRenderer>> reflectedRayRenderers = new Dictionary<int, List<LineRenderer>>();
     public GameObject rayReceiver;
     public bool rayReceiverReflectsRays;
     public float reflectedRayLength = 1000f;
 
     public int maxReflectionCount = 5; // Defines the max depth for recursive reflections
-    
+
     private bool _isProcessingRay = false; // Flag to indicate if a ray is currently being processed
+    private bool _isRayHitting = false; // Flag to indicate if a ray is currently hitting the rayReceiver
+    
+    public List<ActionableObject> actionObjects = new List<ActionableObject>();
 
-
+    
     private LineRenderer CreateNewLineRendererForRay(int rayIndex)
     {
         LineRenderer newRenderer = new GameObject("Reflected Ray Renderer " + rayIndex).AddComponent<LineRenderer>();
@@ -54,6 +50,8 @@ public class RayProcessingController : MonoBehaviour
 
     public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 hitNormal, int rayIndex = 0)
     {
+        _isRayHitting = true; // Set the flag to true
+
         // If a ray is currently being processed, return early
         if (_isProcessingRay) return;
 
@@ -61,11 +59,14 @@ public class RayProcessingController : MonoBehaviour
 
         foreach (ActionableObject actionObject in actionObjects)
         {
-            PerformAction(actionObject, incomingRay);
+            if (_isRayHitting) // Only perform actions if the ray is currently hitting the rayReceiver
+            {
+                PerformAction(actionObject, incomingRay);
+            }
         }
 
         // If rayReceiver should reflect rays, reflect the incoming ray
-        if (rayReceiverReflectsRays)
+        if (rayReceiverReflectsRays && _isRayHitting) // Only reflect if the ray is currently hitting the rayReceiver
         {
             RecursiveRaycast(hitPoint, incomingRay, hitNormal, rayIndex, 0);
         }
@@ -114,49 +115,33 @@ public class RayProcessingController : MonoBehaviour
     }
 
 
-    private void PerformAction(ActionableObject actionObject, Ray incomingRay) // Updated
+    private void PerformAction(ActionableObject actionObject, Ray incomingRay)
     {
-        switch (actionObject.actionToPerform)
-        {
-            case Action.SetMaterial:
-                actionObject.targetObject.GetComponent<Renderer>().material.color = Color.red;
-                break;
-
-            case Action.RemoveGameObject:
-                Destroy(actionObject.targetObject);
-                break;
-        }
+        actionObject.actionHandler.ExecuteAction(actionObject.targetObject, incomingRay);
 
         // If the object can reflect the ray, do it here
         if (actionObject.canReflectRay)
         {
-            // Reflect the ray. 
-            // Note that this assumes the rayReceiver is a flat surface facing upwards.
-            Ray reflectedRay = new Ray(actionObject.targetObject.transform.position,
-                Vector3.Reflect(incomingRay.direction, Vector3.up));
-
-            // Here you can use the reflectedRay for other processing
+            // Reflect the ray.
+            Ray reflectedRay = new Ray(actionObject.targetObject.transform.position, Vector3.Reflect(incomingRay.direction, Vector3.up));
         }
     }
 
+
+
     public void ResetRayHit(GameObject hitObject)
     {
-        if (hitObject == null) return;
+        _isRayHitting = false;
 
-        // Check if a ray is currently being processed, if so, return early
         if (_isProcessingRay) return;
 
         _isProcessingRay = true;
 
-        // Check if the hitObject is the ray receiver.
         if (hitObject == rayReceiver)
         {
             foreach (ActionableObject actionObject in actionObjects)
             {
-                if (actionObject.actionToPerform == Action.SetMaterial)
-                {
-                    actionObject.targetObject.GetComponent<Renderer>().material.color = Color.white;
-                }
+                actionObject.actionHandler.RevertAction(actionObject.targetObject);
             }
 
             // Disable and destroy all reflected ray LineRenderers
@@ -164,7 +149,7 @@ public class RayProcessingController : MonoBehaviour
             {
                 foreach (LineRenderer lineRenderer in rayRenderers.Value)
                 {
-                    if(lineRenderer != null)
+                    if (lineRenderer != null)
                     {
                         lineRenderer.enabled = false;
                         Destroy(lineRenderer.gameObject);
@@ -178,5 +163,4 @@ public class RayProcessingController : MonoBehaviour
 
         _isProcessingRay = false;
     }
-
 }
