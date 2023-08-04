@@ -2,27 +2,30 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-public class RayActivationController : MonoBehaviour
+public class RayActivationController : XRGrabInteractable
 {
-    public List<Transform> raycastOrigins; // Replaced raycastOrigin with a list
-    public Transform attachPoint;
+    public List<Transform> raycastOrigins;
+    public Collider activationTrigger;
     public LayerMask raycastMask;
-
     public GameObject activatorObject;
-
     public List<RayProcessingController> rayProcessingControllers;
+    private Rigidbody _activatorRb;
+    private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
+    private bool _isInsideTrigger = false;
 
-    private XRGrabInteractable _grabInteractable;
-    private Rigidbody _grabInteractableRb;
+    public float rotationSpeed = 50f; // in degrees per second
+    public Material activatorGlowMaterial; // the glowing material
+    private Material _activatorOriginalMaterial; // to store the original material
+    private MeshRenderer _activatorRenderer; // the renderer of the activator object
 
-    private List<LineRenderer> _lineRenderers = new List<LineRenderer>(); // List of LineRenderers for each ray
-    private bool _isActivated = false;
+    public float centeringSpeed = 2f; // adjust as needed
 
-    void Start()
+
+    protected override void Awake()
     {
-        _grabInteractable = GetComponent<XRGrabInteractable>();
+        base.Awake();
+        _activatorRb = activatorObject.GetComponent<Rigidbody>();
 
-        // Initialize a LineRenderer for each raycast origin.
         foreach (Transform raycastOrigin in raycastOrigins)
         {
             LineRenderer lineRenderer = raycastOrigin.gameObject.AddComponent<LineRenderer>();
@@ -33,8 +36,28 @@ public class RayActivationController : MonoBehaviour
             lineRenderer.endWidth = 0.01f;
             lineRenderer.positionCount = 2;
             lineRenderer.enabled = false;
-
             _lineRenderers.Add(lineRenderer);
+        }
+
+        _activatorRenderer = activatorObject.GetComponent<MeshRenderer>();
+        if (_activatorRenderer != null)
+        {
+            _activatorOriginalMaterial = _activatorRenderer.material; // store the original material
+        }
+        else
+        {
+            Debug.LogError("No MeshRenderer found on the activator object.");
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (_isInsideTrigger)
+        {
+            float step = centeringSpeed * Time.deltaTime; // calculate distance to move
+            activatorObject.transform.position = Vector3.MoveTowards(activatorObject.transform.position,
+                activationTrigger.bounds.center, step);
+            activatorObject.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
         }
     }
 
@@ -42,10 +65,14 @@ public class RayActivationController : MonoBehaviour
     {
         if (other.gameObject == activatorObject)
         {
-            _isActivated = true;
-            _grabInteractableRb = other.gameObject.GetComponent<Rigidbody>();
-            _grabInteractableRb.isKinematic = true;
-            other.gameObject.transform.position = attachPoint.position;
+            _isInsideTrigger = true;
+            _activatorRb.useGravity = false;  // here gravity is deactivated
+            _activatorRb.velocity = Vector3.zero;
+            _activatorRb.angularVelocity = Vector3.zero;
+            if (_activatorRenderer != null)
+            {
+                _activatorRenderer.material = activatorGlowMaterial; // set the glowing material
+            }
         }
     }
 
@@ -53,38 +80,30 @@ public class RayActivationController : MonoBehaviour
     {
         if (other.gameObject == activatorObject)
         {
-            _isActivated = false;
-            _grabInteractableRb.isKinematic = false;
-
-            foreach (RayProcessingController controller in rayProcessingControllers)
+            _isInsideTrigger = false;
+            _activatorRb.useGravity = true;  // here gravity is activated again
+            ResetAllRays();
+            if (_activatorRenderer != null)
             {
-                if (controller.rayReceiver != null) // Check if rayReceiver is not null
-                {
-                    controller.ResetRayHit(controller.rayReceiver);
-                }
-            }
-        }
-        else
-        {
-            foreach (RayProcessingController controller in rayProcessingControllers)
-            {
-                if (other.gameObject == controller.rayReceiver &&
-                    controller.rayReceiver != null) // Check if rayReceiver is not null
-                {
-                    controller.ResetRayHit(controller.rayReceiver);
-                }
+                _activatorRenderer.material = _activatorOriginalMaterial; // restore the original material
             }
         }
     }
 
+    protected override void OnSelectEntered(SelectEnterEventArgs args)
+    {
+        base.OnSelectEntered(args);
+        _isInsideTrigger = false;
+        _activatorRb.useGravity = true;  // gravity is also activated if the user grabs the object
+    }
 
     void Update()
     {
-        if (_isActivated)
+        if (_isInsideTrigger)
         {
             for (int i = 0; i < raycastOrigins.Count; i++)
             {
-                Raycast(raycastOrigins[i], _lineRenderers[i], i); // Pass the index
+                Raycast(raycastOrigins[i], _lineRenderers[i], i);
             }
         }
         else
@@ -95,7 +114,6 @@ public class RayActivationController : MonoBehaviour
             }
         }
     }
-
 
     void Raycast(Transform raycastOrigin, LineRenderer lineRenderer, int rayIndex) // rayIndex is added as parameter
     {
@@ -127,5 +145,16 @@ public class RayActivationController : MonoBehaviour
         }
 
         lineRenderer.enabled = true;
+    }
+
+    void ResetAllRays()
+    {
+        foreach (RayProcessingController controller in rayProcessingControllers)
+        {
+            if (controller.rayReceiver != null)
+            {
+                controller.ResetRayHit(controller.rayReceiver);
+            }
+        }
     }
 }
