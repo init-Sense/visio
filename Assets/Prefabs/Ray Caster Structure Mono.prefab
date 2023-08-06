@@ -31,6 +31,37 @@ Transform:
   m_Father: {fileID: 4256920342094688915}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &4171098639462639375
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 569184709354187662}
+  m_Layer: 0
+  m_Name: Hover Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &569184709354187662
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4171098639462639375}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.0615, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7686903117517246982}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6681222300545209552
 GameObject:
   m_ObjectHideFlags: 0
@@ -42,8 +73,8 @@ GameObject:
   - component: {fileID: 7686903117517246982}
   - component: {fileID: 1376037359210197464}
   m_Layer: 0
-  m_Name: Anchor Point
-  m_TagString: Untagged
+  m_Name: Hovering Area
+  m_TagString: ActivatorFloatingArea
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -56,10 +87,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6681222300545209552}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.231, y: 0, z: -0.0000000077486}
-  m_LocalScale: {x: 2.179138, y: 2.179138, z: 2.179138}
+  m_LocalPosition: {x: -0.16607, y: 0, z: -0.000000010831}
+  m_LocalScale: {x: 3.045781, y: 3.045781, z: 3.045781}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 569184709354187662}
   m_Father: {fileID: 4256920342094688915}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -381,6 +413,9 @@ MonoBehaviour:
     m_Bits: 64
   activatorObject: {fileID: 0}
   rayProcessingControllers: []
+  rotationSpeed: 50
+  activatorGlowMaterial: {fileID: 0}
+  centeringSpeed: 2
 --- !u!114 &4618764923733625273
 MonoBehaviour:
   m_ObjectHideFlags: 0

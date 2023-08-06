@@ -1,31 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit;
 
-public class RayActivationController : XRGrabInteractable
+public class RayActivationController : MonoBehaviour
 {
     public List<Transform> raycastOrigins;
-    public Collider activationTrigger;
     public LayerMask raycastMask;
-    public GameObject activatorObject;
     public List<RayProcessingController> rayProcessingControllers;
-    private Rigidbody _activatorRb;
     private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
-    private bool _isInsideTrigger = false;
 
-    public float rotationSpeed = 50f; // in degrees per second
-    public Material activatorGlowMaterial; // the glowing material
-    private Material _activatorOriginalMaterial; // to store the original material
-    private MeshRenderer _activatorRenderer; // the renderer of the activator object
+    private bool _isRayActive = false; // Variable to track ray activation
 
-    public float centeringSpeed = 2f; // adjust as needed
-
-
-    protected override void Awake()
+    void Awake()
     {
-        base.Awake();
-        _activatorRb = activatorObject.GetComponent<Rigidbody>();
-
         foreach (Transform raycastOrigin in raycastOrigins)
         {
             LineRenderer lineRenderer = raycastOrigin.gameObject.AddComponent<LineRenderer>();
@@ -38,68 +24,23 @@ public class RayActivationController : XRGrabInteractable
             lineRenderer.enabled = false;
             _lineRenderers.Add(lineRenderer);
         }
-
-        _activatorRenderer = activatorObject.GetComponent<MeshRenderer>();
-        if (_activatorRenderer != null)
-        {
-            _activatorOriginalMaterial = _activatorRenderer.material; // store the original material
-        }
-        else
-        {
-            Debug.LogError("No MeshRenderer found on the activator object.");
-        }
     }
 
-    void FixedUpdate()
+    // Public method to activate raycasting
+    public void ActivateRaycasting()
     {
-        if (_isInsideTrigger)
-        {
-            float step = centeringSpeed * Time.deltaTime; // calculate distance to move
-            activatorObject.transform.position = Vector3.MoveTowards(activatorObject.transform.position,
-                activationTrigger.bounds.center, step);
-            activatorObject.transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
-        }
+        _isRayActive = true;
     }
 
-    void OnTriggerEnter(Collider other)
+    // Public method to deactivate raycasting
+    public void DeactivateRaycasting()
     {
-        if (other.gameObject == activatorObject)
-        {
-            _isInsideTrigger = true;
-            _activatorRb.useGravity = false;  // here gravity is deactivated
-            _activatorRb.velocity = Vector3.zero;
-            _activatorRb.angularVelocity = Vector3.zero;
-            if (_activatorRenderer != null)
-            {
-                _activatorRenderer.material = activatorGlowMaterial; // set the glowing material
-            }
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject == activatorObject)
-        {
-            _isInsideTrigger = false;
-            _activatorRb.useGravity = true;  // here gravity is activated again
-            ResetAllRays();
-            if (_activatorRenderer != null)
-            {
-                _activatorRenderer.material = _activatorOriginalMaterial; // restore the original material
-            }
-        }
-    }
-
-    protected override void OnSelectEntered(SelectEnterEventArgs args)
-    {
-        base.OnSelectEntered(args);
-        _isInsideTrigger = false;
-        _activatorRb.useGravity = true;  // gravity is also activated if the user grabs the object
+        _isRayActive = false;
     }
 
     void Update()
     {
-        if (_isInsideTrigger)
+        if (_isRayActive)
         {
             for (int i = 0; i < raycastOrigins.Count; i++)
             {
@@ -115,7 +56,7 @@ public class RayActivationController : XRGrabInteractable
         }
     }
 
-    void Raycast(Transform raycastOrigin, LineRenderer lineRenderer, int rayIndex) // rayIndex is added as parameter
+    void Raycast(Transform raycastOrigin, LineRenderer lineRenderer, int rayIndex)
     {
         Ray ray = new Ray(raycastOrigin.position, raycastOrigin.forward);
         RaycastHit hit;
@@ -129,9 +70,11 @@ public class RayActivationController : XRGrabInteractable
             {
                 if (hit.transform.gameObject == controller.rayReceiver)
                 {
-                    controller.ProcessRayHit(hit.point, ray, hit.normal, rayIndex); // rayIndex is passed
+                    controller.ProcessRayHit(hit.point, ray, hit.normal, rayIndex);
                 }
             }
+
+            lineRenderer.enabled = true;
         }
         else
         {
@@ -142,9 +85,9 @@ public class RayActivationController : XRGrabInteractable
             {
                 controller.ResetRayHit(controller.rayReceiver);
             }
-        }
 
-        lineRenderer.enabled = true;
+            lineRenderer.enabled = false;
+        }
     }
 
     void ResetAllRays()

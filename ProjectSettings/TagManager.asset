@@ -10,6 +10,7 @@ TagManager:
   - RayInterceptorColumn
   - DisktangibleWall
   - DisktangibleFloatingArea
+  - ActivatorFloatingArea
   layers:
   - Default
   - TransparentFX
