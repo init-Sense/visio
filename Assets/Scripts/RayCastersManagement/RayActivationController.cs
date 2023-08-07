@@ -68,13 +68,8 @@ public class RayActivationController : MonoBehaviour
 
             foreach (RayProcessingController controller in rayProcessingControllers)
             {
-                if (hit.transform.gameObject == controller.rayReceiver)
-                {
-                    controller.ProcessRayHit(hit.point, ray, hit.normal, rayIndex);
-                }
+                controller.ProcessRayHit(hit.point, ray, hit.normal, rayIndex);
             }
-
-            lineRenderer.enabled = true;
         }
         else
         {
@@ -83,21 +78,11 @@ public class RayActivationController : MonoBehaviour
 
             foreach (RayProcessingController controller in rayProcessingControllers)
             {
-                controller.ResetRayHit(controller.rayReceiver);
-            }
-
-            lineRenderer.enabled = false;
-        }
-    }
-
-    void ResetAllRays()
-    {
-        foreach (RayProcessingController controller in rayProcessingControllers)
-        {
-            if (controller.rayReceiver != null)
-            {
-                controller.ResetRayHit(controller.rayReceiver);
+                controller.ResetAllRayHits(); // Call a method that resets all the RayReceivers inside the controller
             }
         }
+
+        // Always enable the line renderer, even if no hit occurs
+        lineRenderer.enabled = true;
     }
 }

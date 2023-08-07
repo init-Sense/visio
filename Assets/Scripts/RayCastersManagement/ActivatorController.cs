@@ -3,6 +3,8 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class ActivatorController : XRGrabInteractable
 {
+    [SerializeField] private RayActivationController rayActivationController;
+
     public float rotationSpeed = 50f; // Rotation speed in degrees per second
     public float centeringSpeed = 2f; // Adjust as needed
     public Material activatorGlowMaterial; // The glowing material
@@ -11,6 +13,9 @@ public class ActivatorController : XRGrabInteractable
     private Rigidbody _rigidbody; // The rigidbody of the activator object
     private bool _isInsideTrigger = false; // To check if inside the trigger
     private Transform _targetTransform; // The target transform for floating
+
+    private bool _isRayActive = false; // Variable to track ray activation
+
 
     protected override void Awake()
     {
@@ -35,6 +40,18 @@ public class ActivatorController : XRGrabInteractable
             transform.position = Vector3.Lerp(transform.position, _targetTransform.position,
                 Time.deltaTime * centeringSpeed);
             transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+
+            // Activate ray if it's not already active
+            if (!_isRayActive)
+            {
+                rayActivationController.ActivateRaycasting();
+                _isRayActive = true;
+            }
+        }
+        else if (_isRayActive) // Deactivate ray if previously active
+        {
+            rayActivationController.DeactivateRaycasting();
+            _isRayActive = false;
         }
 
 
@@ -53,7 +70,7 @@ public class ActivatorController : XRGrabInteractable
             _rigidbody.velocity = Vector3.zero; // Zero velocity
             _rigidbody.angularVelocity = Vector3.zero; // Zero angular velocity
             _activatorRenderer.material = activatorGlowMaterial; // Set the glowing material
-
+            
             // Find the child transform with the name "Hovering Point"
             _targetTransform = other.transform.Find("Hovering Point");
             if (_targetTransform == null)
@@ -73,6 +90,8 @@ public class ActivatorController : XRGrabInteractable
             _rigidbody.useGravity = true; // Enable gravity
             _activatorRenderer.material = _activatorOriginalMaterial; // Restore the original material
             _targetTransform = null; // Reset the target transform
+            
+            rayActivationController.DeactivateRaycasting();
         }
     }
 
@@ -82,6 +101,10 @@ public class ActivatorController : XRGrabInteractable
         _isInsideTrigger = false;
         _rigidbody.useGravity = true; // Enable gravity
         _targetTransform = null; // Reset the target transform
+        
+        _isRayActive = false;
+
+        rayActivationController.DeactivateRaycasting();
     }
 
     protected override void OnSelectExited(SelectExitEventArgs args)
@@ -90,5 +113,9 @@ public class ActivatorController : XRGrabInteractable
         Debug.Log("OnSelectExited called, enabling gravity");
         _rigidbody.useGravity = true; // Enable gravity
         _targetTransform = null; // Reset the target transform
+        
+        _isRayActive = false;
+
+        rayActivationController.DeactivateRaycasting();
     }
 }

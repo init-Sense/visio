@@ -1,166 +1,157 @@
-﻿using System;
+﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Serialization;
 
 public class RayProcessingController : MonoBehaviour
 {
-    [Serializable]
+    [System.Serializable]
+    public class RayReceiver
+    {
+        public GameObject rayReceiver; // The GameObject affected by the ray
+        public bool enableReflection; // Flag to enable reflection of the ray
+        public List<ActionableObject> actionableObjects; // List of actions to perform on hit
+        public int reflectionLimit; // Limit for recursive reflections
+    }
+
+    [System.Serializable]
     public class ActionableObject
     {
-        public GameObject targetObject;
-        public ActionBase actionHandler;
-        public bool canReflectRay;
-    }
-    
-    public Dictionary<int, List<LineRenderer>> reflectedRayRenderers = new Dictionary<int, List<LineRenderer>>();
-    public GameObject rayReceiver;
-    public bool rayReceiverReflectsRays;
-    public float reflectedRayLength = 1000f;
-
-    public int maxReflectionCount = 5; // Defines the max depth for recursive reflections
-
-    private bool _isProcessingRay = false; // Flag to indicate if a ray is currently being processed
-    private bool _isRayHitting = false; // Flag to indicate if a ray is currently hitting the rayReceiver
-    
-    public List<ActionableObject> actionObjects = new List<ActionableObject>();
-
-    
-    private LineRenderer CreateNewLineRendererForRay(int rayIndex)
-    {
-        LineRenderer newRenderer = new GameObject("Reflected Ray Renderer " + rayIndex).AddComponent<LineRenderer>();
-        newRenderer.transform.parent = this.transform;
-        newRenderer.material = new Material(Shader.Find("Standard"));
-        newRenderer.startColor = Color.blue;
-        newRenderer.endColor = Color.blue;
-        newRenderer.startWidth = 0.01f;
-        newRenderer.endWidth = 0.01f;
-        newRenderer.positionCount = 2;
-        newRenderer.enabled = false;
-
-        if (!reflectedRayRenderers.ContainsKey(rayIndex))
-        {
-            reflectedRayRenderers[rayIndex] = new List<LineRenderer>();
-        }
-
-        reflectedRayRenderers[rayIndex].Add(newRenderer);
-
-        return newRenderer;
+        public GameObject targetObject; // The GameObject affected by the action
+        public ActionBase actionHandler; // The action to perform
     }
 
-    public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 hitNormal, int rayIndex = 0)
+    public List<RayReceiver> rayReceivers;
+
+    public LineRenderer reflectionLineRendererPrefab; // Prefab for line renderer to draw reflections
+
+    public int reflectionLimit = 5; // Limit for recursive reflections
+    
+    private LineRenderer CreateLineRenderer(Vector3 start, Vector3 end)
     {
-        _isRayHitting = true; // Set the flag to true
-
-        // If a ray is currently being processed, return early
-        if (_isProcessingRay) return;
-
-        _isProcessingRay = true;
-
-        foreach (ActionableObject actionObject in actionObjects)
+        LineRenderer lineRenderer;
+        if (reflectionLineRendererPrefab != null)
         {
-            if (_isRayHitting) // Only perform actions if the ray is currently hitting the rayReceiver
-            {
-                PerformAction(actionObject, incomingRay);
-            }
-        }
-
-        // If rayReceiver should reflect rays, reflect the incoming ray
-        if (rayReceiverReflectsRays && _isRayHitting) // Only reflect if the ray is currently hitting the rayReceiver
-        {
-            RecursiveRaycast(hitPoint, incomingRay, hitNormal, rayIndex, 0);
-        }
-
-        _isProcessingRay = false;
-    }
-
-    private void RecursiveRaycast(Vector3 hitPoint, Ray incomingRay, Vector3 hitNormal, int rayIndex,
-        int currentReflectionCount)
-    {
-        Ray reflectedRay = new Ray(hitPoint, Vector3.Reflect(incomingRay.direction, hitNormal));
-
-        RaycastHit reflectedHit;
-
-        LineRenderer currentRayRenderer = CreateNewLineRendererForRay(rayIndex);
-
-        if (Physics.Raycast(reflectedRay, out reflectedHit, reflectedRayLength))
-        {
-            // If reflected ray hits something
-            currentRayRenderer.SetPosition(0, reflectedRay.origin);
-            currentRayRenderer.SetPosition(1, reflectedHit.point);
-
-            Debug.Log("Reflected ray hit " + reflectedHit.transform.gameObject.name);
-
-            // Check if the hit object has a RayProcessingController component and allows reflections, and if we're under the maximum reflection count
-            RayProcessingController hitObjectRPC =
-                reflectedHit.transform.gameObject.GetComponent<RayProcessingController>();
-            if (hitObjectRPC != null && hitObjectRPC.rayReceiverReflectsRays &&
-                currentReflectionCount < maxReflectionCount)
-            {
-                // Call RecursiveRaycast again, but increment the current reflection count and ray index
-                RecursiveRaycast(reflectedHit.point, reflectedRay, reflectedHit.normal, rayIndex + 1,
-                    currentReflectionCount + 1);
-            }
+            lineRenderer = Instantiate(reflectionLineRendererPrefab, transform);
         }
         else
         {
-            // If reflected ray doesn't hit anything, just draw in direction of reflection
-            currentRayRenderer.SetPosition(0, reflectedRay.origin);
-            currentRayRenderer.SetPosition(1, reflectedRay.origin + reflectedRay.direction * reflectedRayLength);
-
-            Debug.Log("Reflected ray didn't hit anything");
+            GameObject reflectionLineObject = new GameObject("ReflectionLine");
+            reflectionLineObject.transform.SetParent(transform);
+            lineRenderer = reflectionLineObject.AddComponent<LineRenderer>();
+            lineRenderer.material = new Material(Shader.Find("Standard"));
+            lineRenderer.startColor = Color.yellow;
+            lineRenderer.endColor = Color.yellow;
+            lineRenderer.startWidth = 0.01f;
+            lineRenderer.endWidth = 0.01f;
+            lineRenderer.positionCount = 2;
         }
 
-        currentRayRenderer.enabled = true;
+        // Set positions for the line renderer
+        lineRenderer.SetPosition(0, start);
+        lineRenderer.SetPosition(1, end);
+
+        return lineRenderer;
     }
 
 
-    private void PerformAction(ActionableObject actionObject, Ray incomingRay)
+    public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal, int rayIndex)
     {
-        actionObject.actionHandler.ExecuteAction(actionObject.targetObject, incomingRay);
+        RaycastHit hit;
 
-        // If the object can reflect the ray, do it here
-        if (actionObject.canReflectRay)
+        foreach (Transform child in transform)
         {
-            // Reflect the ray.
-            Ray reflectedRay = new Ray(actionObject.targetObject.transform.position, Vector3.Reflect(incomingRay.direction, Vector3.up));
-        }
-    }
-
-
-
-    public void ResetRayHit(GameObject hitObject)
-    {
-        _isRayHitting = false;
-
-        if (_isProcessingRay) return;
-
-        _isProcessingRay = true;
-
-        if (hitObject == rayReceiver)
-        {
-            foreach (ActionableObject actionObject in actionObjects)
+            if (child.GetComponent<LineRenderer>())
             {
-                actionObject.actionHandler.RevertAction(actionObject.targetObject);
+                Destroy(child.gameObject);
             }
+        }
 
-            // Disable and destroy all reflected ray LineRenderers
-            foreach (var rayRenderers in reflectedRayRenderers)
+        if (Physics.Raycast(incomingRay, out hit))
+        {
+            foreach (RayReceiver receiver in rayReceivers)
             {
-                foreach (LineRenderer lineRenderer in rayRenderers.Value)
+                if (receiver.rayReceiver != null)
                 {
-                    if (lineRenderer != null)
+                    // Check if the ray hit the intended receiver (interceptor)
+                    if (hit.collider.gameObject == receiver.rayReceiver)
                     {
-                        lineRenderer.enabled = false;
-                        Destroy(lineRenderer.gameObject);
+                        if (receiver.enableReflection)
+                        {
+                            ReflectRay(hitPoint, incomingRay.direction, normal, 0);
+                        }
+
+                        // Perform actions on the associated target objects
+                        foreach (ActionableObject action in receiver.actionableObjects)
+                        {
+                            action.actionHandler.ExecuteAction(action.targetObject, incomingRay);
+                        }
                     }
                 }
             }
-
-            // Clear the lists of LineRenderers.
-            reflectedRayRenderers.Clear();
         }
+    }
 
-        _isProcessingRay = false;
+
+    private void ReflectRay(Vector3 origin, Vector3 direction, Vector3 normal, int reflectionCount)
+    {
+        if (reflectionCount >= reflectionLimit) return; // Terminate if the reflection limit is reached
+
+        Ray ray = new Ray(origin, Vector3.Reflect(direction, normal));
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            // Create or instantiate the line renderer for the reflection
+            LineRenderer lineRenderer = CreateLineRenderer(origin, hit.point);
+
+            // Check if the ray hit a receiver that has reflection enabled
+            foreach (RayReceiver receiver in rayReceivers)
+            {
+                if (hit.transform.gameObject == receiver.rayReceiver)
+                {
+                    // Reflect the ray if reflection is enabled
+                    if (receiver.enableReflection)
+                    {
+                        ReflectRay(hit.point, ray.direction, hit.normal, reflectionCount + 1);
+                    }
+
+                    // Perform actions on the associated target objects
+                    foreach (ActionableObject action in receiver.actionableObjects)
+                    {
+                        action.actionHandler.ExecuteAction(action.targetObject, ray);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    public void ResetRayHit(GameObject rayReceiverGameObject)
+    {
+        // Find the corresponding RayReceiver for this GameObject
+        foreach (RayReceiver receiver in rayReceivers)
+        {
+            if (receiver.rayReceiver == rayReceiverGameObject)
+            {
+                foreach (ActionableObject action in receiver.actionableObjects)
+                {
+                    action.actionHandler.RevertAction(action.targetObject);
+                }
+
+                // Add other reset logic here as needed
+                break;
+            }
+        }
+    }
+
+    public void ResetAllRayHits()
+    {
+        foreach (RayReceiver receiver in rayReceivers)
+        {
+            if (receiver.rayReceiver != null)
+            {
+                ResetRayHit(receiver.rayReceiver);
+            }
+        }
     }
 }

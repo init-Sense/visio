@@ -832,7 +832,7 @@ PrefabInstance:
     - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: rayProcessingControllers.Array.data[1]
       value: 
-      objectReference: {fileID: 1421655159}
+      objectReference: {fileID: 0}
     - target: {fileID: 3522926894880578691, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -1088,6 +1088,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: e866ac91f2989d145bed2a6044c273aa, type: 2}
     - target: {fileID: 9022356120216494044, guid: b4c30521b25c922409ded7bee636fb67, type: 3}
+      propertyPath: actionObjects.Array.data[0].canReflectRay
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9022356120216494044, guid: b4c30521b25c922409ded7bee636fb67, type: 3}
       propertyPath: actionObjects.Array.data[0].ActionToPerform
       value: 1
       objectReference: {fileID: 0}
@@ -1321,13 +1325,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 941092597}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.440762, y: -10.598879, z: 14.2433}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -1.8302853, y: -28.713455, z: -29.723242}
+  m_LocalScale: {x: 2.5026512, y: 2.5026512, z: 2.5026512}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_Father: {fileID: 966628409}
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &941092599
 MonoBehaviour:
@@ -1347,8 +1351,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   rayProcessingControllers:
-  - {fileID: 1908265372}
-  - {fileID: 1421655159}
+  - {fileID: 1774578986}
 --- !u!1 &966628408
 GameObject:
   m_ObjectHideFlags: 0
@@ -1377,6 +1380,7 @@ Transform:
   m_LocalScale: {x: 2.1429265, y: 2.1429265, z: 2.1429265}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 941092598}
   - {fileID: 371031783}
   - {fileID: 1603658545}
   - {fileID: 678909365}
@@ -1384,6 +1388,7 @@ Transform:
   - {fileID: 1421655155}
   - {fileID: 1558059609}
   - {fileID: 233333389}
+  - {fileID: 1774578985}
   m_Father: {fileID: 2022638539}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1662,11 +1667,10 @@ MonoBehaviour:
   m_StartingSingleGrabTransformers: []
   m_StartingMultipleGrabTransformers: []
   m_AddDefaultGrabTransformers: 1
+  rayActivationController: {fileID: 941092599}
   rotationSpeed: 50
   centeringSpeed: 2
   activatorGlowMaterial: {fileID: 0}
-  rayActivationController: {fileID: 941092599}
-  tolerance: 0.01
 --- !u!1 &988832974
 GameObject:
   m_ObjectHideFlags: 0
@@ -2263,7 +2267,6 @@ GameObject:
   - component: {fileID: 1421655158}
   - component: {fileID: 1421655157}
   - component: {fileID: 1421655156}
-  - component: {fileID: 1421655159}
   m_Layer: 6
   m_Name: Cube
   m_TagString: RayInterceptor
@@ -2357,23 +2360,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1421655154}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1421655159
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1421655154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0748ef6bfb194a4dbf728039d33a4b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rayReceiver: {fileID: 1421655154}
-  rayReceiverReflectsRays: 1
-  reflectedRayLength: 1000
-  maxReflectionCount: 5
-  actionObjects: []
 --- !u!1 &1479925825 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b8d767658c865d24c9bc4549ec02f11f, type: 3}
@@ -2493,9 +2479,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1558059608}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7101bff06f54a8097f0f12f05698f29, type: 3}
+  m_Script: {fileID: 11500000, guid: d0748ef6bfb194a4dbf728039d33a4b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rayReceivers: []
+  reflectionLineRendererPrefab: {fileID: 0}
 --- !u!65 &1558059611
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2902,6 +2890,74 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 568297ca832c62646bd6e176b24bfb78, type: 3}
+--- !u!1 &1774578984
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1774578985}
+  - component: {fileID: 1774578986}
+  m_Layer: 0
+  m_Name: RayProcessingController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1774578985
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774578984}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 966628409}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1774578986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1774578984}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0748ef6bfb194a4dbf728039d33a4b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rayReceivers:
+  - rayReceiver: {fileID: 1421655154}
+    enableReflection: 1
+    actionableObjects: []
+    reflectionLimit: 2
+  - rayReceiver: {fileID: 834050572}
+    enableReflection: 1
+    actionableObjects:
+    - targetObject: {fileID: 1421655154}
+      actionHandler: {fileID: 11400000, guid: e866ac91f2989d145bed2a6044c273aa, type: 2}
+    reflectionLimit: 2
+  - rayReceiver: {fileID: 1558059608}
+    enableReflection: 1
+    actionableObjects:
+    - targetObject: {fileID: 1421655154}
+      actionHandler: {fileID: 11400000, guid: e866ac91f2989d145bed2a6044c273aa, type: 2}
+    reflectionLimit: 2
+  - rayReceiver: {fileID: 233333388}
+    enableReflection: 1
+    actionableObjects:
+    - targetObject: {fileID: 1421655154}
+      actionHandler: {fileID: 11400000, guid: e866ac91f2989d145bed2a6044c273aa, type: 2}
+    reflectionLimit: 2
+  reflectionLineRendererPrefab: {fileID: 0}
 --- !u!1 &1815318735
 GameObject:
   m_ObjectHideFlags: 0
