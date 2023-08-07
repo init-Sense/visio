@@ -1,8 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// This class controls the processing of ray hits.
+/// Each ray receiver has a list of actionable objects and a flag to enable/disable the reflection of the ray.
+/// The ray receivers are activated/deactivated by the RayActivationController.
+/// </summary>
 public class RayProcessingController : MonoBehaviour
 {
+    [Tooltip("List of ray receivers.")]
     [System.Serializable]
     public class RayReceiver
     {
@@ -12,6 +18,7 @@ public class RayProcessingController : MonoBehaviour
         public int reflectionLimit; // Limit for recursive reflections
     }
 
+    [Tooltip("List of actions to perform on hit.")]
     [System.Serializable]
     public class ActionableObject
     {
@@ -19,10 +26,13 @@ public class RayProcessingController : MonoBehaviour
         public ActionBase actionHandler; // The action to perform
     }
 
+    [Tooltip("List of ray receivers.")]
     public List<RayReceiver> rayReceivers;
 
+    [Tooltip("Prefab for line renderer to draw reflections.")]
     public LineRenderer reflectionLineRendererPrefab; // Prefab for line renderer to draw reflections
 
+    [Tooltip("Limit for recursive reflections.")]
     public int reflectionLimit = 5; // Limit for recursive reflections
     
     private LineRenderer CreateLineRenderer(Vector3 start, Vector3 end)

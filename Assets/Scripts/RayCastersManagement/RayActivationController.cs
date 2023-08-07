@@ -1,88 +1,110 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// This class controls the activation of ray casting groups.
+/// Each group has a list of raycast origins and a raycast mask.
+/// The ray casting groups are activated/deactivated by the RayProcessingController.
+/// </summary>
+
 public class RayActivationController : MonoBehaviour
 {
-    public List<Transform> raycastOrigins;
-    public LayerMask raycastMask;
-    public List<RayProcessingController> rayProcessingControllers;
-    private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
+    [Tooltip("List of raycast groups.")]
+    [System.Serializable]
+    public class RayCasterGroup
+    {
+        public List<Transform> raycastOrigins;
+        public LayerMask raycastMask;
+        public bool isActive; // Individual activation for each group
+    }
 
-    private bool _isRayActive = false; // Variable to track ray activation
+    [Tooltip("List of raycast groups.")]
+    public List<RayCasterGroup> rayCasterGroups;
+    
+    [Tooltip("Reference to the ray processing controller.")]
+    public RayProcessingController rayProcessingController;
+
+    private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
 
     void Awake()
     {
-        foreach (Transform raycastOrigin in raycastOrigins)
+        foreach (RayCasterGroup group in rayCasterGroups)
         {
-            LineRenderer lineRenderer = raycastOrigin.gameObject.AddComponent<LineRenderer>();
-            lineRenderer.material = new Material(Shader.Find("Standard"));
-            lineRenderer.startColor = Color.red;
-            lineRenderer.endColor = Color.red;
-            lineRenderer.startWidth = 0.01f;
-            lineRenderer.endWidth = 0.01f;
-            lineRenderer.positionCount = 2;
-            lineRenderer.enabled = false;
-            _lineRenderers.Add(lineRenderer);
+            foreach (Transform raycastOrigin in group.raycastOrigins)
+            {
+                LineRenderer lineRenderer = raycastOrigin.gameObject.AddComponent<LineRenderer>();
+                lineRenderer.material = new Material(Shader.Find("Standard"));
+                lineRenderer.startColor = Color.red;
+                lineRenderer.endColor = Color.red;
+                lineRenderer.startWidth = 0.01f;
+                lineRenderer.endWidth = 0.01f;
+                lineRenderer.positionCount = 2;
+                lineRenderer.enabled = false;
+
+                _lineRenderers.Add(lineRenderer); // Add the line renderer to the list
+            }
         }
     }
 
-    // Public method to activate raycasting
-    public void ActivateRaycasting()
+    public void ActivateRaycasting(int groupIndex)
     {
-        _isRayActive = true;
+        if (groupIndex < rayCasterGroups.Count)
+        {
+            rayCasterGroups[groupIndex].isActive = true;
+        }
     }
 
-    // Public method to deactivate raycasting
-    public void DeactivateRaycasting()
+    public void DeactivateRaycasting(int groupIndex)
     {
-        _isRayActive = false;
+        if (groupIndex < rayCasterGroups.Count)
+        {
+            rayCasterGroups[groupIndex].isActive = false;
+        }
     }
 
     void Update()
     {
-        if (_isRayActive)
+        int lineRendererIndex = 0;
+        foreach (RayCasterGroup group in rayCasterGroups)
         {
-            for (int i = 0; i < raycastOrigins.Count; i++)
+            if (group.isActive)
             {
-                Raycast(raycastOrigins[i], _lineRenderers[i], i);
+                for (int i = 0; i < group.raycastOrigins.Count; i++)
+                {
+                    Raycast(group.raycastOrigins[i], _lineRenderers[lineRendererIndex++], group.raycastMask);
+                }
             }
-        }
-        else
-        {
-            foreach (LineRenderer lineRenderer in _lineRenderers)
+            else
             {
-                lineRenderer.enabled = false;
+                for (int i = 0; i < group.raycastOrigins.Count; i++)
+                {
+                    _lineRenderers[lineRendererIndex++].enabled = false;
+                }
             }
         }
     }
 
-    void Raycast(Transform raycastOrigin, LineRenderer lineRenderer, int rayIndex)
+    void Raycast(Transform raycastOrigin, LineRenderer lineRenderer, LayerMask raycastMask) // Correct parameter
     {
         Ray ray = new Ray(raycastOrigin.position, raycastOrigin.forward);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask)) // Corrected to raycastMask
         {
             lineRenderer.SetPosition(0, raycastOrigin.position);
             lineRenderer.SetPosition(1, hit.point);
 
-            foreach (RayProcessingController controller in rayProcessingControllers)
-            {
-                controller.ProcessRayHit(hit.point, ray, hit.normal, rayIndex);
-            }
+            rayProcessingController.ProcessRayHit(hit.point, ray, hit.normal, 0);
         }
         else
         {
             lineRenderer.SetPosition(0, raycastOrigin.position);
             lineRenderer.SetPosition(1, raycastOrigin.position + raycastOrigin.forward * 1000);
 
-            foreach (RayProcessingController controller in rayProcessingControllers)
-            {
-                controller.ResetAllRayHits(); // Call a method that resets all the RayReceivers inside the controller
-            }
+            rayProcessingController
+                .ResetAllRayHits(); // Call a method that resets all the RayReceivers inside the controller
         }
 
-        // Always enable the line renderer, even if no hit occurs
         lineRenderer.enabled = true;
     }
 }

@@ -1,18 +1,58 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.XR.Interaction.Toolkit;
 
+/// <summary>
+/// This class is used to control the disk object.
+/// The disk object is used to render tangible objects intangible.
+/// </summary>
 public class DiskTangibleController : XRGrabInteractable
 {
     private bool _isInsideTrigger = false;
+
+    // Disk object reference.
     private Vector3 _startPosition;
     private Quaternion _startRotation;
     private Rigidbody _rigidbody;
-    public Transform boxCenter;
+
+    [Tooltip("This is where the disk will actually float to.")] [SerializeField]
+    public Transform hoverPoint;
+
+    [Tooltip("This is the wall object that will be disabled when the disk enters its associated trigger.")]
+    [SerializeField]
     public GameObject wallObject;
+
+    [Tooltip("Assign a material for the wall object when the disk enters its associated trigger.")] [SerializeField]
     public Material transparentMaterial;
+
+    // Wall object reference.
     private Material _originalMaterial;
     private MeshRenderer _wallMeshRenderer;
     private Collider _wallCollider;
+
+    private void SetMaterial(Material material)
+    {
+        if (_wallMeshRenderer)
+        {
+            _wallMeshRenderer.material = material;
+        }
+        else
+        {
+            Debug.LogError("MeshRenderer for the wall object is not found.");
+        }
+    }
+
+    private void SetColliderEnabled(bool isEnabled)
+    {
+        if (_wallCollider)
+        {
+            _wallCollider.enabled = isEnabled;
+        }
+        else
+        {
+            Debug.LogError("Collider for the wall object is not found.");
+        }
+    }
 
     void Start()
     {
@@ -43,15 +83,8 @@ public class DiskTangibleController : XRGrabInteractable
     {
         if (_isInsideTrigger)
         {
-            // Float and rotate the disk.
-            transform.position = Vector3.Lerp(transform.position, boxCenter.position, Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, hoverPoint.position, Time.deltaTime);
             transform.Rotate(Vector3.up, 50.0f * Time.deltaTime);
-        }
-        else
-        {
-            // Return disk to initial position if it is not inside the trigger.
-            transform.position = Vector3.Lerp(transform.position, _startPosition, Time.deltaTime);
-            transform.rotation = Quaternion.Lerp(transform.rotation, _startRotation, Time.deltaTime);
         }
     }
 
@@ -64,7 +97,6 @@ public class DiskTangibleController : XRGrabInteractable
             _rigidbody.velocity = Vector3.zero;
             _rigidbody.angularVelocity = Vector3.zero;
 
-            // Change the wall material to the transparent one and disable collider
             SetMaterial(transparentMaterial);
             SetColliderEnabled(false);
         }
@@ -77,7 +109,6 @@ public class DiskTangibleController : XRGrabInteractable
             _isInsideTrigger = false;
             _rigidbody.useGravity = true;
 
-            // Change the wall material back to the original one and enable collider
             SetMaterial(_originalMaterial);
             SetColliderEnabled(true);
         }
@@ -94,29 +125,5 @@ public class DiskTangibleController : XRGrabInteractable
     {
         base.OnSelectExited(args);
         _rigidbody.useGravity = true;
-    }
-
-    private void SetMaterial(Material material)
-    {
-        if (_wallMeshRenderer)
-        {
-            _wallMeshRenderer.material = material;
-        }
-        else
-        {
-            Debug.LogError("MeshRenderer for the wall object is not found.");
-        }
-    }
-
-    private void SetColliderEnabled(bool isEnabled)
-    {
-        if (_wallCollider)
-        {
-            _wallCollider.enabled = isEnabled;
-        }
-        else
-        {
-            Debug.LogError("Collider for the wall object is not found.");
-        }
     }
 }

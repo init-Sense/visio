@@ -828,7 +828,7 @@ PrefabInstance:
     - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: rayProcessingControllers.Array.data[0]
       value: 
-      objectReference: {fileID: 1908265372}
+      objectReference: {fileID: 0}
     - target: {fileID: 497561944063000126, guid: ec0b8b58ef61df34cbdb607545a71a88, type: 3}
       propertyPath: rayProcessingControllers.Array.data[1]
       value: 
@@ -1076,6 +1076,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 834050572}
     - target: {fileID: 9022356120216494044, guid: b4c30521b25c922409ded7bee636fb67, type: 3}
+      propertyPath: rayReceivers.Array.data[0].rayReceiver
+      value: 
+      objectReference: {fileID: 834050572}
+    - target: {fileID: 9022356120216494044, guid: b4c30521b25c922409ded7bee636fb67, type: 3}
       propertyPath: actionObjects.Array.data[0].TargetObject
       value: 
       objectReference: {fileID: 1421655154}
@@ -1099,7 +1103,8 @@ PrefabInstance:
       propertyPath: actionObjects.Array.data[0].actionToPerform
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 9022356120216494044, guid: b4c30521b25c922409ded7bee636fb67, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1345,13 +1350,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6782a0acf006dde48989685e1aa505fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  raycastOrigins:
-  - {fileID: 1286749792}
-  raycastMask:
-    serializedVersion: 2
-    m_Bits: 64
-  rayProcessingControllers:
-  - {fileID: 1774578986}
+  rayCasterGroups:
+  - raycastOrigins:
+    - {fileID: 1286749792}
+    raycastMask:
+      serializedVersion: 2
+      m_Bits: 64
+    isActive: 0
+  rayProcessingController: {fileID: 1774578986}
 --- !u!1 &966628408
 GameObject:
   m_ObjectHideFlags: 0
@@ -1671,6 +1677,7 @@ MonoBehaviour:
   rotationSpeed: 50
   centeringSpeed: 2
   activatorGlowMaterial: {fileID: 0}
+  groupIndex: 0
 --- !u!1 &988832974
 GameObject:
   m_ObjectHideFlags: 0
@@ -2484,6 +2491,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rayReceivers: []
   reflectionLineRendererPrefab: {fileID: 0}
+  reflectionLimit: 5
 --- !u!65 &1558059611
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2958,6 +2966,7 @@ MonoBehaviour:
       actionHandler: {fileID: 11400000, guid: e866ac91f2989d145bed2a6044c273aa, type: 2}
     reflectionLimit: 2
   reflectionLineRendererPrefab: {fileID: 0}
+  reflectionLimit: 5
 --- !u!1 &1815318735
 GameObject:
   m_ObjectHideFlags: 0
@@ -3485,17 +3494,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 674340280032488212, guid: 1d1d8aeff5efa4047bd163be88c65bd6, type: 3}
---- !u!114 &1908265372 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9022356120216494044, guid: b4c30521b25c922409ded7bee636fb67, type: 3}
-  m_PrefabInstance: {fileID: 834050571}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0748ef6bfb194a4dbf728039d33a4b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!64 &1955022435
 MeshCollider:
   m_ObjectHideFlags: 0
