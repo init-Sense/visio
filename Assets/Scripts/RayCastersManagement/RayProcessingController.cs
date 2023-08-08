@@ -26,15 +26,14 @@ public class RayProcessingController : MonoBehaviour
         public ActionBase actionHandler; // The action to perform
     }
 
-    [Tooltip("List of ray receivers.")]
-    public List<RayReceiver> rayReceivers;
+    [Tooltip("List of ray receivers.")] public List<RayReceiver> rayReceivers;
 
     [Tooltip("Prefab for line renderer to draw reflections.")]
     public LineRenderer reflectionLineRendererPrefab; // Prefab for line renderer to draw reflections
 
     [Tooltip("Limit for recursive reflections.")]
     public int reflectionLimit = 5; // Limit for recursive reflections
-    
+
     private LineRenderer CreateLineRenderer(Vector3 start, Vector3 end)
     {
         LineRenderer lineRenderer;
@@ -65,8 +64,7 @@ public class RayProcessingController : MonoBehaviour
 
     public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal, int rayIndex)
     {
-        RaycastHit hit;
-
+        // Destroy all existing lines first
         foreach (Transform child in transform)
         {
             if (child.GetComponent<LineRenderer>())
@@ -75,6 +73,8 @@ public class RayProcessingController : MonoBehaviour
             }
         }
 
+        bool rayHitReceiver = false;
+        RaycastHit hit;
         if (Physics.Raycast(incomingRay, out hit))
         {
             foreach (RayReceiver receiver in rayReceivers)
@@ -84,6 +84,7 @@ public class RayProcessingController : MonoBehaviour
                     // Check if the ray hit the intended receiver (interceptor)
                     if (hit.collider.gameObject == receiver.rayReceiver)
                     {
+                        rayHitReceiver = true;
                         if (receiver.enableReflection)
                         {
                             ReflectRay(hitPoint, incomingRay.direction, normal, 0);
@@ -98,7 +99,14 @@ public class RayProcessingController : MonoBehaviour
                 }
             }
         }
+
+        if (!rayHitReceiver)
+        {
+            // Reset reflection or any other logic when the ray did not hit a receiver
+            ResetAllRayHits();
+        }
     }
+
 
 
     private void ReflectRay(Vector3 origin, Vector3 direction, Vector3 normal, int reflectionCount)
@@ -133,7 +141,6 @@ public class RayProcessingController : MonoBehaviour
             }
         }
     }
-
 
 
     public void ResetRayHit(GameObject rayReceiverGameObject)

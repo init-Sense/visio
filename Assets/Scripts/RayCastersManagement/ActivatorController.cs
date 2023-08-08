@@ -47,6 +47,9 @@ public class ActivatorController : XRGrabInteractable
 
     void FixedUpdate()
     {
+        if (_targetTransform == null || !_isInsideTrigger)
+            return;
+        
         if (_isInsideTrigger)
         {
             // Float and rotate the activator towards the target transform.
@@ -78,17 +81,24 @@ public class ActivatorController : XRGrabInteractable
     {
         if (other.CompareTag("ActivatorFloatingArea"))
         {
-            _isInsideTrigger = true;
-            _rigidbody.useGravity = false; // Disable gravity
-            _rigidbody.velocity = Vector3.zero; // Zero velocity
-            _rigidbody.angularVelocity = Vector3.zero; // Zero angular velocity
-            _activatorRenderer.material = activatorGlowMaterial; // Set the glowing material
-
-            // Find the child transform with the name "Hovering Point"
-            _targetTransform = other.transform.Find("Hovering Point");
-            if (_targetTransform == null)
+            if (other.transform.childCount > 0)
             {
-                Debug.LogError("No child transform named 'Hovering Point' found under ActivatorFloatingArea.");
+                _isInsideTrigger = true;
+                _rigidbody.useGravity = false; // Disable gravity
+                _rigidbody.velocity = Vector3.zero; // Zero velocity
+                _rigidbody.angularVelocity = Vector3.zero; // Zero angular velocity
+                _activatorRenderer.material = activatorGlowMaterial; // Set the glowing material
+
+                // Find the child transform with the name "Hovering Point"
+                _targetTransform = other.transform.Find("Hovering Point");
+                if (_targetTransform == null)
+                {
+                    Debug.LogError("No child transform named 'Hovering Point' found under ActivatorFloatingArea.");
+                }
+            }
+            else
+            {
+                Debug.LogError("No child transform found under ActivatorFloatingArea.");
             }
         }
     }
