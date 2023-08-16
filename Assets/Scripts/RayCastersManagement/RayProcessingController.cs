@@ -23,7 +23,9 @@ public class RayProcessingController : MonoBehaviour
     public class ActionableObject
     {
         public GameObject targetObject; // The GameObject affected by the action
-        public ActionBase actionHandler; // The action to perform
+        public ActionBase actionBase; // The action to perform
+        [Tooltip("Amount by which to increase the transparency for this object. Value between 0 (fully opaque) and 1 (fully transparent).")]
+        public float transparencyIncrement = 0.1f; // Default value
     }
 
     [Tooltip("List of ray receivers.")] public List<RayReceiver> rayReceivers;
@@ -85,6 +87,7 @@ public class RayProcessingController : MonoBehaviour
                     if (hit.collider.gameObject == receiver.rayReceiver)
                     {
                         rayHitReceiver = true;
+                        
                         if (receiver.enableReflection)
                         {
                             ReflectRay(hitPoint, incomingRay.direction, normal, 0);
@@ -93,7 +96,7 @@ public class RayProcessingController : MonoBehaviour
                         // Perform actions on the associated target objects
                         foreach (ActionableObject action in receiver.actionableObjects)
                         {
-                            action.actionHandler.ExecuteAction(action.targetObject, incomingRay);
+                            action.actionBase.ExecuteAction(action.targetObject, incomingRay, action.transparencyIncrement);
                         }
                     }
                 }
@@ -135,7 +138,7 @@ public class RayProcessingController : MonoBehaviour
                     // Perform actions on the associated target objects
                     foreach (ActionableObject action in receiver.actionableObjects)
                     {
-                        action.actionHandler.ExecuteAction(action.targetObject, ray);
+                        action.actionBase.ExecuteAction(action.targetObject, ray);
                     }
                 }
             }
@@ -152,7 +155,7 @@ public class RayProcessingController : MonoBehaviour
             {
                 foreach (ActionableObject action in receiver.actionableObjects)
                 {
-                    action.actionHandler.RevertAction(action.targetObject);
+                    action.actionBase.RevertAction(action.targetObject);
                 }
 
                 // Add other reset logic here as needed
