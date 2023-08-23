@@ -174,4 +174,9 @@ public class RayProcessingController : MonoBehaviour
             }
         }
     }
+    
+    private void OnEnable()
+    {
+        ResetAllRayHits();
+    }
 }
