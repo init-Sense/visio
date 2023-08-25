@@ -25,6 +25,9 @@ public class RayActivationController : MonoBehaviour
     public RayProcessingController rayProcessingController;
 
     private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
+    
+    private float resetCooldown = 1.0f; // Time in seconds before ray hits can be reset
+    private float lastResetTime = -1.0f;
 
     void Awake()
     {
@@ -65,13 +68,15 @@ public class RayActivationController : MonoBehaviour
     void Update()
     {
         int lineRendererIndex = 0;
+        int uniqueRayId = 0; // Unique ray ID starts from 0
+        
         foreach (RayCasterGroup group in rayCasterGroups)
         {
             if (group.isActive)
             {
                 for (int i = 0; i < group.raycastOrigins.Count; i++)
                 {
-                    Raycast(group.raycastOrigins[i], _lineRenderers[lineRendererIndex++], group.raycastMask);
+                    Raycast(group.raycastOrigins[i], _lineRenderers[lineRendererIndex++], group.raycastMask, uniqueRayId++);
                 }
             }
             else
@@ -84,25 +89,29 @@ public class RayActivationController : MonoBehaviour
         }
     }
 
-    void Raycast(Transform raycastOrigin, LineRenderer lineRenderer, LayerMask raycastMask) // Correct parameter
+    void Raycast(Transform raycastOrigin, LineRenderer lineRenderer, LayerMask raycastMask, int uniqueRayId) 
     {
         Ray ray = new Ray(raycastOrigin.position, raycastOrigin.forward);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask)) // Corrected to raycastMask
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
         {
             lineRenderer.SetPosition(0, raycastOrigin.position);
             lineRenderer.SetPosition(1, hit.point);
 
-            rayProcessingController.ProcessRayHit(hit.point, ray, hit.normal, 0);
+            rayProcessingController.ProcessRayHit(hit.point, ray, hit.normal, 0, uniqueRayId);
         }
         else
         {
             lineRenderer.SetPosition(0, raycastOrigin.position);
             lineRenderer.SetPosition(1, raycastOrigin.position + raycastOrigin.forward * 1000);
 
-            rayProcessingController
-                .ResetAllRayHits(); // Call a method that resets all the RayReceivers inside the controller
+            // Only reset rays if the cooldown has passed
+            if (Time.time - lastResetTime > resetCooldown)
+            {
+                rayProcessingController.ResetAllRayHits(); // Call a method that resets all the RayReceivers inside the controller
+                lastResetTime = Time.time;
+            }
         }
 
         lineRenderer.enabled = true;

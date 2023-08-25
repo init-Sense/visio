@@ -4,13 +4,16 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "RemoveGameObjectAction", menuName = "Actions/Remove GameObject")]
 public class RemoveGameObjectAction : ActionBase
 {
-    public override void ExecuteAction(GameObject targetObject, Ray incomingRay, float transparencyIncrement = 0f)
-    {
-        targetObject.SetActive(false);
-    }
+public override void ExecuteAction(GameObject targetObject, Ray incomingRay, float transparencyIncrement = 0f)
+{
+    Debug.Log("Executing: Removing GameObject " + targetObject.name);
+    targetObject.SetActive(false);
+}
 
-    public override void RevertAction(GameObject targetObject)
-    {
-        targetObject.SetActive(true);
-    }
+public override void RevertAction(GameObject targetObject)
+{
+    Debug.Log("Reverting: Setting GameObject active " + targetObject.name);
+    targetObject.SetActive(true);
+}
+
 }
