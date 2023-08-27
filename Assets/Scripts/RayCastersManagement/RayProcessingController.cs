@@ -1,11 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections.Generic;
 
 /// <summary>
 /// This class controls the processing of ray hits.
-/// Each ray receiver has a list of actionable objects and a flag to enable/disable the reflection of the ray.
-/// The ray receivers are activated/deactivated by the RayActivationController.
+/// The game object with this script is the ray receiver itself.
 /// </summary>
 public class RayProcessingController : MonoBehaviour
 {
@@ -17,21 +15,25 @@ public class RayProcessingController : MonoBehaviour
         PartialHit
     }
 
-    private Dictionary<GameObject, ReceiverState> receiverStates = new Dictionary<GameObject, ReceiverState>();
-
-    [Tooltip("List of ray receivers.")]
-    [System.Serializable]
-    public class RayReceiver
-    {
-        public GameObject rayReceiver;
-        public bool enableReflection;
-        public List<ActionableObject> actionableObjects;
-        public int requiredHits = 1; // default to 1 for backward compatibility
-        [HideInInspector] public List<int> rayHits = new List<int>();
-        [HideInInspector] public bool isActivated = false;
-    }
+    [Tooltip("Enable/disable the reflection of the ray.")]
+    public bool enableReflection;
 
     [Tooltip("List of actions to perform on hit.")]
+    public ActionableObject[] actionableObjects;
+
+    [Tooltip("Line renderer prefab for reflections.")]
+    public LineRenderer reflectionLineRendererPrefab;
+
+    [Tooltip("Limit for recursive reflections.")]
+    public int reflectionLimit = 5;
+
+    [HideInInspector] public ReceiverState receiverState = ReceiverState.Idle;
+    [HideInInspector] public int rayHits = 0;
+    [HideInInspector] public bool isActivated = false;
+
+    private LineRenderer reflectionLineRenderer;
+    public LineRenderer currentReflectionLine;
+
     [System.Serializable]
     public class ActionableObject
     {
@@ -40,12 +42,112 @@ public class RayProcessingController : MonoBehaviour
         public float transparencyIncrement = 0.1f; // Default value
     }
 
-    public List<RayReceiver> rayReceivers;
-    public LineRenderer reflectionLineRendererPrefab;
-    public int reflectionLimit = 5; // Limit for recursive reflections
-
-    private LineRenderer CreateLineRenderer(Vector3 start, Vector3 end)
+    public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal)
     {
+        if (receiverState == ReceiverState.ActionExecuted)
+        {
+            return;
+        }
+
+        rayHits++;
+        Debug.Log($"Ray hit receiver {gameObject.name}. Total hits: {rayHits}");
+
+        if (rayHits >= 1)
+        {
+            ExecuteActionsAndResetRayHits(incomingRay);
+            receiverState = ReceiverState.ActionExecuted;
+        }
+        else
+        {
+            RevertActions();
+            receiverState = ReceiverState.PartialHit;
+        }
+
+        if (enableReflection)
+        {
+            ReflectRay(hitPoint, incomingRay.direction, normal, 0);
+        }
+    }
+
+
+    private void ExecuteActionsAndResetRayHits(Ray incomingRay)
+    {
+        Debug.Log($"Receiver {gameObject.name} achieved required hits.");
+
+        receiverState = ReceiverState.ActionExecuted;
+        isActivated = true;
+
+        try
+        {
+            foreach (ActionableObject action in actionableObjects)
+            {
+                action.actionBase.ExecuteAction(action.targetObject, incomingRay, action.transparencyIncrement);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error executing actions for receiver {gameObject.name}: {e.Message}");
+            receiverState = ReceiverState.PartialHit;
+            RevertActions();
+            return;
+        }
+
+        rayHits = 0;
+    }
+
+    private void ReflectRay(Vector3 origin, Vector3 direction, Vector3 normal, int reflectionCount)
+    {
+        Debug.Log("ReflectRay called: reflectionCount = " + reflectionCount);
+        if (reflectionCount >= reflectionLimit) return;
+
+        Vector3 reflectedDirection = Vector3.Reflect(direction, normal);
+        Vector3 newOrigin = origin;
+        Ray ray = new Ray(newOrigin, reflectedDirection);
+        RaycastHit hit;
+
+        Vector3 endPoint = newOrigin + reflectedDirection * 1000; // default end point if no hit
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            Debug.Log("Ray hit: " + hit.collider.gameObject.name);
+            endPoint = hit.point;
+
+            RayProcessingController hitReceiver = hit.collider.gameObject.GetComponent<RayProcessingController>();
+            if (hitReceiver != null)
+            {
+                Debug.Log("Valid receiver found: " + hitReceiver.gameObject.name);
+
+                if (hitReceiver.receiverState != ReceiverState.ActionExecuted)
+                {
+                    if (hitReceiver.enableReflection)
+                    {
+                        Debug.Log("Reflection enabled, reflecting ray");
+                        hitReceiver.ReflectRay(hit.point, ray.direction, hit.normal, reflectionCount + 1);
+                    }
+
+                    foreach (ActionableObject action in hitReceiver.actionableObjects)
+                    {
+                        action.actionBase.ExecuteAction(action.targetObject, ray);
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("Ray did not hit any object");
+        }
+
+        // Update the reflection line
+        if (currentReflectionLine != null)
+        {
+            currentReflectionLine.SetPosition(1, endPoint);
+        }
+    }
+
+    public LineRenderer CreateReflectionLineRenderer(Vector3 start, Vector3 end)
+    {
+        Debug.Log("CreateReflectionLineRenderer called with start: " + start + ", end: " + end);
+
         LineRenderer lineRenderer;
         if (reflectionLineRendererPrefab != null)
         {
@@ -64,6 +166,8 @@ public class RayProcessingController : MonoBehaviour
             lineRenderer.positionCount = 2;
         }
 
+        lineRenderer.useWorldSpace = true;
+
         // Set positions for the line renderer
         lineRenderer.SetPosition(0, start);
         lineRenderer.SetPosition(1, end);
@@ -71,238 +175,42 @@ public class RayProcessingController : MonoBehaviour
         return lineRenderer;
     }
 
-    private bool isProcessingHit = false;
-
-    // Receiver initialization
-    private void Start()
+    public void DestroyReflectionLine()
     {
-        InitializeReceiverStates();
-    }
-
-    private void InitializeReceiverStates()
-    {
-        foreach (RayReceiver receiver in rayReceivers)
+        if (currentReflectionLine != null)
         {
-            if (receiver.rayReceiver != null)
-            {
-                receiverStates[receiver.rayReceiver] = ReceiverState.Idle;
-            }
+            Destroy(currentReflectionLine.gameObject);
+            currentReflectionLine = null;
         }
     }
 
-
-    // Standard ray hit
-
-    public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal, int rayIndex, int uniqueRayId)
+    public void ResetRayHit()
     {
-        if (isProcessingHit)
+        Debug.Log($"Resetting ray hits for receiver {gameObject.name}");
+
+        foreach (ActionableObject action in actionableObjects)
         {
-            return;
+            action.actionBase.RevertAction(action.targetObject);
         }
 
-        isProcessingHit = true;
+        receiverState = ReceiverState.Idle;
+        rayHits = 0;
+        isActivated = false;
 
-        DestroyExistingLines();
-
-        bool rayHitReceiver = ProcessRayHitOnReceiver(hitPoint, incomingRay, normal, uniqueRayId);
-
-        if (!rayHitReceiver)
-        {
-            ResetActivatedReceivers();
-        }
-
-        isProcessingHit = false;
+        // Destroy the reflection line
+        DestroyReflectionLine();
     }
 
-    private bool ProcessRayHitOnReceiver(Vector3 hitPoint, Ray incomingRay, Vector3 normal, int uniqueRayId)
+    private void RevertActions()
     {
-        bool rayHitReceiver = false;
-        RaycastHit hit;
-        if (Physics.Raycast(incomingRay, out hit))
-        {
-            foreach (RayReceiver receiver in rayReceivers)
-            {
-                if (receiver.rayReceiver != null && hit.collider.gameObject == receiver.rayReceiver)
-                {
-                    rayHitReceiver = true;
-                    HandleRayHit(receiver, incomingRay, normal, uniqueRayId, hitPoint);
-                }
-            }
-        }
-
-        return rayHitReceiver;
-    }
-
-    private void HandleRayHit(RayReceiver receiver, Ray incomingRay, Vector3 normal, int uniqueRayId, Vector3 hitPoint)
-    {
-        if (!receiver.rayHits.Contains(uniqueRayId))
-        {
-            receiver.rayHits.Add(uniqueRayId);
-            Debug.Log(
-                $"Ray {uniqueRayId} hit receiver {receiver.rayReceiver.name}. Total hits: {receiver.rayHits.Count}, Required hits: {receiver.requiredHits}");
-
-            ReceiverState currentState;
-            if (receiverStates.TryGetValue(receiver.rayReceiver, out currentState))
-            {
-                if (receiver.rayHits.Count >= receiver.requiredHits && currentState != ReceiverState.ActionExecuted)
-                {
-                    ExecuteActionsAndResetRayHits(receiver, incomingRay);
-                    receiverStates[receiver.rayReceiver] = ReceiverState.ActionExecuted;
-                }
-                else if (receiver.rayHits.Count < receiver.requiredHits)
-                {
-                    RevertActions(receiver);
-                    receiverStates[receiver.rayReceiver] = ReceiverState.PartialHit;
-                }
-
-                if (receiver.enableReflection)
-                {
-                    ReflectRay(hitPoint, incomingRay.direction, normal, 0, uniqueRayId);
-                }
-            }
-        }
-    }
-
-
-    private void ExecuteActionsAndResetRayHits(RayReceiver receiver, Ray incomingRay)
-    {
-        Debug.Log($"Receiver {receiver.rayReceiver.name} achieved required hits.");
-
-        // Update the state first
-        receiverStates[receiver.rayReceiver] = ReceiverState.ActionExecuted;
-
-        // Set the activation flag
-        receiver.isActivated = true;
-
-        // Execute the actions
-        try
-        {
-            foreach (ActionableObject action in receiver.actionableObjects)
-            {
-                action.actionBase.ExecuteAction(action.targetObject, incomingRay, action.transparencyIncrement);
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"Error executing actions for receiver {receiver.rayReceiver.name}: {e.Message}");
-            // Handle the error, e.g., revert the state or actions
-            receiverStates[receiver.rayReceiver] = ReceiverState.PartialHit;
-            RevertActions(receiver);
-            return;
-        }
-
-        // Reset the hit count if you want to count subsequent hits from the same ray
-        receiver.rayHits.Clear();
-    }
-
-    // Reflections
-
-    private void ReflectRay(Vector3 origin, Vector3 direction, Vector3 normal, int reflectionCount, int uniqueRayId)
-    {
-        if (reflectionCount >= reflectionLimit) return; // Terminate if the reflection limit is reached
-
-        Ray ray = new Ray(origin, Vector3.Reflect(direction, normal));
-        RaycastHit hit;
-
-        if (Physics.Raycast(ray, out hit))
-        {
-            // Create or instantiate the line renderer for the reflection
-            LineRenderer lineRenderer = CreateLineRenderer(origin, hit.point);
-
-            // Check if the ray hit a receiver that has reflection enabled
-            foreach (RayReceiver receiver in rayReceivers)
-            {
-                if (hit.transform.gameObject == receiver.rayReceiver)
-                {
-                    if (!receiver.rayHits.Contains(uniqueRayId))
-                    {
-                        // Reflect the ray if reflection is enabled
-                        if (receiver.enableReflection)
-                        {
-                            ReflectRay(hit.point, ray.direction, hit.normal, reflectionCount + 1, uniqueRayId);
-                        }
-
-                        // Perform actions on the associated target objects
-                        foreach (ActionableObject action in receiver.actionableObjects)
-                        {
-                            action.actionBase.ExecuteAction(action.targetObject, ray);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    // Resetters
-
-    public void ResetRayHit(GameObject rayReceiverGameObject)
-    {
-        Debug.Log($"Attempting to reset ray hits for receiver {rayReceiverGameObject.name}");
-
-        // Find the corresponding RayReceiver for this GameObject
-        foreach (RayReceiver receiver in rayReceivers)
-        {
-            if (receiver.rayReceiver == rayReceiverGameObject)
-            {
-                foreach (ActionableObject action in receiver.actionableObjects)
-                {
-                    action.actionBase.RevertAction(action.targetObject);
-                }
-
-                // Reset state to Idle after actions have been reverted
-                receiverStates[rayReceiverGameObject] = ReceiverState.Idle;
-                receiver.rayHits.Clear();
-
-                break;
-            }
-        }
-    }
-
-
-    public void ResetAllRayHits()
-    {
-        foreach (RayReceiver receiver in rayReceivers)
-        {
-            if (receiver.rayReceiver != null)
-            {
-                ResetRayHit(receiver.rayReceiver);
-            }
-        }
-    }
-
-    private void DestroyExistingLines()
-    {
-        foreach (Transform child in transform)
-        {
-            if (child.GetComponent<LineRenderer>())
-            {
-                Destroy(child.gameObject);
-            }
-        }
-    }
-
-    private void RevertActions(RayReceiver receiver)
-    {
-        foreach (ActionableObject action in receiver.actionableObjects)
+        foreach (ActionableObject action in actionableObjects)
         {
             action.actionBase.RevertAction(action.targetObject);
         }
     }
 
-    private void ResetActivatedReceivers()
-    {
-        foreach (RayReceiver receiver in rayReceivers)
-        {
-            if (receiver.isActivated)
-            {
-                ResetRayHit(receiver.rayReceiver);
-                receiver.isActivated = false;
-            }
-        }
-    }
-
     private void OnEnable()
     {
-        ResetAllRayHits();
+        ResetRayHit();
     }
 }

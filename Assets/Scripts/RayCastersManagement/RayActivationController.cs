@@ -1,108 +1,51 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// This class controls the activation of ray casting groups.
-/// Each group has a list of raycast origins and a raycast mask.
-/// The ray casting groups are activated/deactivated by the RayProcessingController.
+/// This class controls the activation of ray casting.
+/// The ray casting is activated/deactivated by the RayProcessingController.
 /// </summary>
 public class RayActivationController : MonoBehaviour
 {
-    [Tooltip("List of raycast groups.")]
-    [System.Serializable]
-    public class RayCasterGroup
-    {
-        public List<Transform> raycastOrigins;
-        public LayerMask raycastMask;
-        public bool isActive; // Individual activation for each group
-    }
-
-    [Tooltip("List of raycast groups.")] public List<RayCasterGroup> rayCasterGroups;
-
+    [Tooltip("Raycast origin.")]
+    public Transform raycastOrigin;
+    [Tooltip("Raycast mask.")]
+    public LayerMask raycastMask;
     [Tooltip("Reference to the ray processing controller.")]
     public RayProcessingController rayProcessingController;
 
-    private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
-
-    private float resetCooldown = 1.0f; // Time in seconds before ray hits can be reset
-    private float lastResetTime = -1.0f;
+    private LineRenderer _lineRenderer;
 
     void Awake()
     {
-        foreach (RayCasterGroup group in rayCasterGroups)
-        {
-            foreach (Transform raycastOrigin in group.raycastOrigins)
-            {
-                LineRenderer lineRenderer = raycastOrigin.gameObject.AddComponent<LineRenderer>();
-                lineRenderer.material = new Material(Shader.Find("Standard"));
-                lineRenderer.startColor = Color.red;
-                lineRenderer.endColor = Color.red;
-                lineRenderer.startWidth = 0.01f;
-                lineRenderer.endWidth = 0.01f;
-                lineRenderer.positionCount = 2;
-                lineRenderer.enabled = false;
-
-                _lineRenderers.Add(lineRenderer); // Add the line renderer to the list
-            }
-        }
+        _lineRenderer = raycastOrigin.gameObject.AddComponent<LineRenderer>();
+        _lineRenderer.material = new Material(Shader.Find("Standard"));
+        _lineRenderer.startColor = Color.red;
+        _lineRenderer.endColor = Color.red;
+        _lineRenderer.startWidth = 0.01f;
+        _lineRenderer.endWidth = 0.01f;
+        _lineRenderer.positionCount = 2;
+        _lineRenderer.enabled = false;
     }
 
-    public void ActivateRaycasting(int groupIndex)
+    public void ActivateRaycasting()
     {
-        if (groupIndex < rayCasterGroups.Count)
-        {
-            rayCasterGroups[groupIndex].isActive = true;
-        }
+        _lineRenderer.enabled = true;
     }
 
-    public void DeactivateRaycasting(int groupIndex)
+    public void DeactivateRaycasting()
     {
-        if (groupIndex < rayCasterGroups.Count)
-        {
-            rayCasterGroups[groupIndex].isActive = false;
-        }
+        _lineRenderer.enabled = false;
     }
 
     void Update()
     {
-        int lineRendererIndex = 0;
-        int uniqueRayId = 0; // Unique ray ID starts from 0
-
-        foreach (RayCasterGroup group in rayCasterGroups)
+        if (_lineRenderer.enabled)
         {
-            int hitsInGroup = 0;
-
-            if (group.isActive)
-            {
-                for (int i = 0; i < group.raycastOrigins.Count; i++)
-                {
-                    if (Raycast(group.raycastOrigins[i], _lineRenderers[lineRendererIndex], group.raycastMask,
-                            uniqueRayId))
-                    {
-                        hitsInGroup++;
-                    }
-
-                    lineRendererIndex++;
-                    uniqueRayId++;
-                }
-
-                if (hitsInGroup == 0 && Time.time - lastResetTime > resetCooldown)
-                {
-                    rayProcessingController.ResetAllRayHits();
-                    lastResetTime = Time.time;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < group.raycastOrigins.Count; i++)
-                {
-                    _lineRenderers[lineRendererIndex++].enabled = false;
-                }
-            }
+            Raycast(raycastOrigin, _lineRenderer, raycastMask);
         }
     }
 
-    bool Raycast(Transform raycastOrigin, LineRenderer lineRenderer, LayerMask raycastMask, int uniqueRayId)
+    bool Raycast(Transform raycastOrigin, LineRenderer lineRenderer, LayerMask raycastMask)
     {
         Ray ray = new Ray(raycastOrigin.position, raycastOrigin.forward);
         RaycastHit hit;
@@ -113,23 +56,30 @@ public class RayActivationController : MonoBehaviour
         if (hitSomething)
         {
             lineRenderer.SetPosition(1, hit.point);
-            rayProcessingController.ProcessRayHit(hit.point, ray, hit.normal, 0, uniqueRayId);
+
+            if (rayProcessingController.enableReflection)
+            {
+                // Create or update the reflection line
+                if (rayProcessingController.currentReflectionLine == null)
+                {
+                    rayProcessingController.currentReflectionLine = rayProcessingController.CreateReflectionLineRenderer(hit.point, hit.point);
+                }
+
+                Vector3 reflectedDirection = Vector3.Reflect(ray.direction, hit.normal);
+                Vector3 endPoint = hit.point + reflectedDirection * 1000; // default end point if no hit
+                rayProcessingController.currentReflectionLine.SetPosition(0, hit.point);
+                rayProcessingController.currentReflectionLine.SetPosition(1, endPoint);
+            }
+
+            rayProcessingController.ProcessRayHit(hit.point, ray, hit.normal);
         }
         else
         {
             lineRenderer.SetPosition(1, raycastOrigin.position + raycastOrigin.forward * 1000);
-
-            // Only reset rays if the cooldown has passed
-            if (Time.time - lastResetTime > resetCooldown)
-            {
-                rayProcessingController
-                    .ResetAllRayHits(); // Call a method that resets all the RayReceivers inside the controller
-                lastResetTime = Time.time;
-            }
+            rayProcessingController.DestroyReflectionLine();
         }
 
-        lineRenderer.enabled = true;
         return hitSomething;
     }
-
+    
 }
