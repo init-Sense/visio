@@ -10,7 +10,6 @@ public class RayProcessingController : MonoBehaviour
     public enum ReceiverState
     {
         Idle,
-        RayHitting,
         ActionExecuted,
         PartialHit
     }
@@ -41,9 +40,47 @@ public class RayProcessingController : MonoBehaviour
         public ActionBase actionBase;
         public float transparencyIncrement = 0.1f; // Default value
     }
+    
+    private RayActivationController rayActivationController;
+
+    private void Start()
+    {
+        rayActivationController = FindObjectOfType<RayActivationController>();
+    }
+
+    private void Update()
+    {
+        if (receiverState == ReceiverState.ActionExecuted)
+        {
+            CheckRayExit();
+        }
+    }
+
+    private void CheckRayExit()
+    {
+        Ray ray = new Ray(rayActivationController.raycastOrigin.position, rayActivationController.raycastOrigin.forward);
+        RaycastHit hit;
+        bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, rayActivationController.raycastMask);
+
+        if (!hitSomething || hit.collider.gameObject != gameObject)
+        {
+            ResetRayHit();
+        }
+    }
 
     public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal)
     {
+        if (enableReflection)
+        {
+            // Create the reflection line
+            if (currentReflectionLine == null)
+            {
+                currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint);
+            }
+
+            ReflectRay(hitPoint, incomingRay.direction, normal, 0);
+        }
+
         if (receiverState == ReceiverState.ActionExecuted)
         {
             return;
@@ -62,14 +99,8 @@ public class RayProcessingController : MonoBehaviour
             RevertActions();
             receiverState = ReceiverState.PartialHit;
         }
-
-        if (enableReflection)
-        {
-            ReflectRay(hitPoint, incomingRay.direction, normal, 0);
-        }
     }
-
-
+    
     private void ExecuteActionsAndResetRayHits(Ray incomingRay)
     {
         Debug.Log($"Receiver {gameObject.name} achieved required hits.");
@@ -119,16 +150,7 @@ public class RayProcessingController : MonoBehaviour
 
                 if (hitReceiver.receiverState != ReceiverState.ActionExecuted)
                 {
-                    if (hitReceiver.enableReflection)
-                    {
-                        Debug.Log("Reflection enabled, reflecting ray");
-                        hitReceiver.ReflectRay(hit.point, ray.direction, hit.normal, reflectionCount + 1);
-                    }
-
-                    foreach (ActionableObject action in hitReceiver.actionableObjects)
-                    {
-                        action.actionBase.ExecuteAction(action.targetObject, ray);
-                    }
+                    hitReceiver.ProcessRayHit(hit.point, ray, hit.normal);
                 }
             }
         }
@@ -143,6 +165,7 @@ public class RayProcessingController : MonoBehaviour
             currentReflectionLine.SetPosition(1, endPoint);
         }
     }
+
 
     public LineRenderer CreateReflectionLineRenderer(Vector3 start, Vector3 end)
     {

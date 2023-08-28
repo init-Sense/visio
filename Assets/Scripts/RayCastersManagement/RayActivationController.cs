@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// This class controls the activation of ray casting.
-/// The ray casting is activated/deactivated by the RayProcessingController.
-/// </summary>
 public class RayActivationController : MonoBehaviour
 {
     [Tooltip("Raycast origin.")]
@@ -35,6 +31,7 @@ public class RayActivationController : MonoBehaviour
     public void DeactivateRaycasting()
     {
         _lineRenderer.enabled = false;
+        rayProcessingController.ResetRayHit();
     }
 
     void Update()
@@ -57,29 +54,17 @@ public class RayActivationController : MonoBehaviour
         {
             lineRenderer.SetPosition(1, hit.point);
 
-            if (rayProcessingController.enableReflection)
+            RayProcessingController hitReceiver = hit.collider.gameObject.GetComponent<RayProcessingController>();
+            if (hitReceiver != null)
             {
-                // Create or update the reflection line
-                if (rayProcessingController.currentReflectionLine == null)
-                {
-                    rayProcessingController.currentReflectionLine = rayProcessingController.CreateReflectionLineRenderer(hit.point, hit.point);
-                }
-
-                Vector3 reflectedDirection = Vector3.Reflect(ray.direction, hit.normal);
-                Vector3 endPoint = hit.point + reflectedDirection * 1000; // default end point if no hit
-                rayProcessingController.currentReflectionLine.SetPosition(0, hit.point);
-                rayProcessingController.currentReflectionLine.SetPosition(1, endPoint);
+                hitReceiver.ProcessRayHit(hit.point, ray, hit.normal);
             }
-
-            rayProcessingController.ProcessRayHit(hit.point, ray, hit.normal);
         }
         else
         {
             lineRenderer.SetPosition(1, raycastOrigin.position + raycastOrigin.forward * 1000);
-            rayProcessingController.DestroyReflectionLine();
         }
 
         return hitSomething;
     }
-    
 }
