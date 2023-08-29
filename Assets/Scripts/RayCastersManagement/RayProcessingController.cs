@@ -32,6 +32,8 @@ public class RayProcessingController : MonoBehaviour
 
     private LineRenderer reflectionLineRenderer;
     public LineRenderer currentReflectionLine;
+    
+    [HideInInspector] public bool levelCompleted = false;
 
     [System.Serializable]
     public class ActionableObject
@@ -107,6 +109,7 @@ public class RayProcessingController : MonoBehaviour
 
         receiverState = ReceiverState.ActionExecuted;
         isActivated = true;
+        levelCompleted = true;
 
         try
         {
@@ -211,9 +214,14 @@ public class RayProcessingController : MonoBehaviour
     {
         Debug.Log($"Resetting ray hits for receiver {gameObject.name}");
 
-        foreach (ActionableObject action in actionableObjects)
+        if (levelCompleted)
         {
-            action.actionBase.RevertAction(action.targetObject);
+            foreach (ActionableObject action in actionableObjects)
+            {
+                action.actionBase.RevertAction(action.targetObject);
+            }
+
+            levelCompleted = false;
         }
 
         receiverState = ReceiverState.Idle;
@@ -223,6 +231,7 @@ public class RayProcessingController : MonoBehaviour
         // Destroy the reflection line
         DestroyReflectionLine();
     }
+
 
     private void RevertActions()
     {

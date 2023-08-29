@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -26,6 +27,9 @@ public class ActivatorController : XRGrabInteractable
     private Transform _targetTransform;
 
     private bool _isRayActive = false;
+    public AreaController areaController;
+
+    private bool isSelectExitedCalled = false;
 
     protected override void Awake()
     {
@@ -109,30 +113,47 @@ public class ActivatorController : XRGrabInteractable
             _targetTransform = null;
 
             rayActivationController.DeactivateRaycasting();
+            rayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
         }
     }
+
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
         base.OnSelectEntered(args);
-        _isInsideTrigger = false;
-        _rigidbody.useGravity = true;
-        _targetTransform = null;
+        Debug.Log("OnSelectEntered called, disabling gravity");
+        _rigidbody.useGravity = false;
+        _targetTransform = args.interactable.transform;
 
-        _isRayActive = false;
+        _isRayActive = true;
 
-        rayActivationController.DeactivateRaycasting();
+        isSelectExitedCalled = false;
     }
 
-    protected override void OnSelectExited(SelectExitEventArgs args)
+protected override void OnSelectExited(SelectExitEventArgs args)
+{
+    if (isSelectExitedCalled)
     {
-        base.OnSelectExited(args);
-        Debug.Log("OnSelectExited called, enabling gravity");
-        _rigidbody.useGravity = true;
-        _targetTransform = null;
+        return;
+    }
 
-        _isRayActive = false;
+    base.OnSelectExited(args);
+    Debug.Log("OnSelectExited called, enabling gravity");
+    _rigidbody.useGravity = true;
+    _targetTransform = null;
 
+    _isRayActive = false;
+
+    StartCoroutine(DeactivateRaycastingWithDelay());
+
+    isSelectExitedCalled = true;
+}
+
+
+    private IEnumerator DeactivateRaycastingWithDelay()
+    {
+        yield return new WaitForSeconds(1f); // adjust the delay as needed
         rayActivationController.DeactivateRaycasting();
+        _isRayActive = false;
     }
 }
