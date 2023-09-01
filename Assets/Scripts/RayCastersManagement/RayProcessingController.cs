@@ -35,6 +35,9 @@ public class RayProcessingController : MonoBehaviour
     
     [HideInInspector] public bool levelCompleted = false;
 
+    [HideInInspector] public bool actionsExecuted = false;
+
+    
     [System.Serializable]
     public class ActionableObject
     {
@@ -52,7 +55,7 @@ public class RayProcessingController : MonoBehaviour
 
     private void Update()
     {
-        if (receiverState == ReceiverState.ActionExecuted)
+        if (receiverState == ReceiverState.ActionExecuted && !actionsExecuted)
         {
             CheckRayExit();
         }
@@ -72,12 +75,22 @@ public class RayProcessingController : MonoBehaviour
 
     public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal)
     {
-        RotateToDestinationAction rotateAction = GetComponent<RotateToDestinationAction>();
-        if (rotateAction != null)
+        if (receiverState == ReceiverState.ActionExecuted || actionsExecuted)
         {
-            rotateAction.ExecuteAction();
+            if (enableReflection)
+            {
+                // Create the reflection line
+                if (currentReflectionLine == null)
+                {
+                    currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint);
+                }
+
+                ReflectRay(hitPoint, incomingRay.direction, normal, 0);
+            }
+
+            return;
         }
-        
+
         if (enableReflection)
         {
             // Create the reflection line
@@ -87,11 +100,6 @@ public class RayProcessingController : MonoBehaviour
             }
 
             ReflectRay(hitPoint, incomingRay.direction, normal, 0);
-        }
-
-        if (receiverState == ReceiverState.ActionExecuted)
-        {
-            return;
         }
 
         rayHits++;
@@ -112,10 +120,12 @@ public class RayProcessingController : MonoBehaviour
     private void ExecuteActionsAndResetRayHits(Ray incomingRay)
     {
         Debug.Log($"Receiver {gameObject.name} achieved required hits.");
-
         receiverState = ReceiverState.ActionExecuted;
+        actionsExecuted = true;
+
         isActivated = true;
         levelCompleted = true;
+        
 
         try
         {
@@ -230,6 +240,7 @@ public class RayProcessingController : MonoBehaviour
             levelCompleted = false;
         }
 
+        actionsExecuted = false;
         receiverState = ReceiverState.Idle;
         rayHits = 0;
         isActivated = false;

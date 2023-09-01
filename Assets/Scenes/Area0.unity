@@ -2217,6 +2217,7 @@ MonoBehaviour:
   isActivated: 0
   currentReflectionLine: {fileID: 0}
   levelCompleted: 0
+  actionsExecuted: 0
 --- !u!114 &533258498
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4208,6 +4209,7 @@ MonoBehaviour:
   isActivated: 0
   currentReflectionLine: {fileID: 0}
   levelCompleted: 0
+  actionsExecuted: 0
 --- !u!1 &1014122641 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3653261481603074434, guid: 160e0b53634dac747bc7275dd899e170, type: 3}
@@ -4993,6 +4995,7 @@ MonoBehaviour:
   isActivated: 0
   currentReflectionLine: {fileID: 0}
   levelCompleted: 0
+  actionsExecuted: 0
 --- !u!1001 &1143737453
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5247,6 +5250,7 @@ MonoBehaviour:
   isActivated: 0
   currentReflectionLine: {fileID: 0}
   levelCompleted: 0
+  actionsExecuted: 0
 --- !u!65 &1206107840
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9037,7 +9041,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4656389392494278942, guid: 160e0b53634dac747bc7275dd899e170, type: 3}
       propertyPath: actionableObjects.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4656389392494278942, guid: 160e0b53634dac747bc7275dd899e170, type: 3}
       propertyPath: actionableObjects.Array.data[0].actionBase
