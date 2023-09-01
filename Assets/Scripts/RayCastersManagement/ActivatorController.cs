@@ -30,12 +30,35 @@ public class ActivatorController : XRGrabInteractable
     public AreaController areaController;
 
     private bool isSelectExitedCalled = false;
+    
+    [Tooltip("Assign a target GameObject to change its material when the ray is activated.")]
+    public GameObject targetObject;
+
+    [Tooltip("Assign a material for the target object when the ray is activated.")]
+    public Material targetGlowMaterial;
+
+    private Material _targetOriginalMaterial;
+    private MeshRenderer _targetRenderer;
 
     protected override void Awake()
     {
         base.Awake();
         _activatorRenderer = GetComponent<MeshRenderer>();
         _rigidbody = GetComponent<Rigidbody>();
+        
+        if (targetObject != null)
+        {
+            _targetRenderer = targetObject.GetComponent<MeshRenderer>();
+            if (_targetRenderer != null)
+            {
+                _targetOriginalMaterial = _targetRenderer.material;
+            }
+            else
+            {
+                Debug.LogError("No MeshRenderer found on the target object.");
+            }
+        }
+        
         if (_activatorRenderer != null)
         {
             _activatorOriginalMaterial = _activatorRenderer.material;
@@ -88,6 +111,7 @@ public class ActivatorController : XRGrabInteractable
                 _rigidbody.velocity = Vector3.zero;
                 _rigidbody.angularVelocity = Vector3.zero;
                 _activatorRenderer.material = activatorGlowMaterial;
+                _targetRenderer.material = targetGlowMaterial;
 
                 _targetTransform = other.transform.Find("Hovering Point");
                 if (_targetTransform == null)
@@ -110,6 +134,7 @@ public class ActivatorController : XRGrabInteractable
             _isInsideTrigger = false;
             _rigidbody.useGravity = true;
             _activatorRenderer.material = _activatorOriginalMaterial;
+            _targetRenderer.material = _targetOriginalMaterial;
             _targetTransform = null;
 
             rayActivationController.DeactivateRaycasting();

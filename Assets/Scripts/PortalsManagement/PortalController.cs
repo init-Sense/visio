@@ -20,8 +20,15 @@ public class PortalController : MonoBehaviour
             {
                 playerTransform.position = portalEntry.destination.position;
                 playerTransform.rotation = portalEntry.destination.rotation;
+                Rigidbody rb = playerTransform.GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
                 return;
             }
         }
     }
+
 }

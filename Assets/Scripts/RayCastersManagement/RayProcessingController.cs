@@ -72,6 +72,12 @@ public class RayProcessingController : MonoBehaviour
 
     public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal)
     {
+        RotateToDestinationAction rotateAction = GetComponent<RotateToDestinationAction>();
+        if (rotateAction != null)
+        {
+            rotateAction.ExecuteAction();
+        }
+        
         if (enableReflection)
         {
             // Create the reflection line
