@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 416140588857676095}
   m_Layer: 0
-  m_Name: Semisphere_18
+  m_Name: Semisphere_M
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -86,7 +86,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bec55d4db1724f44d9b16839025abe43, type: 3}
       propertyPath: m_Name
-      value: Semisphere_18
+      value: Semisphere_M
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
