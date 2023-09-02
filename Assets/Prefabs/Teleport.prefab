@@ -223,6 +223,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: ad57c35436c6b46429b424d5c5070439, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: d65d9974f1d03e243a2983411bb8d492, type: 3}
     - target: {fileID: 919132149155446097, guid: ad57c35436c6b46429b424d5c5070439, type: 3}
       propertyPath: m_Name
       value: TeleportWave
@@ -390,6 +394,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: a341688b2d54b584796304a23252a5ee, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: d65d9974f1d03e243a2983411bb8d492, type: 3}
     - target: {fileID: 919132149155446097, guid: a341688b2d54b584796304a23252a5ee, type: 3}
       propertyPath: m_Name
       value: TeleportDisk

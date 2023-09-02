@@ -86,6 +86,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 78c421c98445028428a6b5cf978bf78f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: 14832425138a3ab4b87efb6e1bdb6114, type: 3}
     - target: {fileID: 919132149155446097, guid: 78c421c98445028428a6b5cf978bf78f, type: 3}
       propertyPath: m_Name
       value: IntangibleWall_S
@@ -264,6 +268,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: 760113ab0e17dca428ea463a791154bb, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: fbfec536114aea1438d93a865d2158a5, type: 2}
     - target: {fileID: 919132149155446097, guid: 760113ab0e17dca428ea463a791154bb, type: 3}
       propertyPath: m_Name
       value: Frame_Hole_S

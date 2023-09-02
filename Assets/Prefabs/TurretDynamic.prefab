@@ -116,8 +116,8 @@ Transform:
   m_Children:
   - {fileID: 6661262995704570487}
   - {fileID: 5458090114954840173}
-  - {fileID: 8315003258895271582}
   - {fileID: 4723277557836997978}
+  - {fileID: 836965038124255219}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -470,7 +470,7 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 71850995f7d37be479d85382cb87b291, type: 3}
   m_PrefabInstance: {fileID: 6627950769030137244}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &8425788594472771957
+--- !u!1001 &8936716185506778006
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -478,61 +478,61 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5390204626856576503}
     m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
+    - target: {fileID: 5616372994590200314, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
+      propertyPath: m_Name
+      value: EnergyRing_Turret
+      objectReference: {fileID: 0}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
       propertyPath: m_RootOrder
-      value: -1
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.012
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.375
+      value: 0.376
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.17364816
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
-      propertyPath: m_LocalRotation.y
       value: 0.9848078
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
-      propertyPath: m_LocalRotation.z
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
+      propertyPath: m_LocalRotation.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.17364825
+      objectReference: {fileID: 0}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 180
+      value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
+    - target: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
-      propertyPath: m_Name
-      value: EnergyRing_Turret
+      value: -20
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
---- !u!4 &8315003258895271582 stripped
+  m_SourcePrefab: {fileID: 100100000, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
+--- !u!4 &836965038124255219 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 5d5a476463b1c2242a4258a068052212, type: 3}
-  m_PrefabInstance: {fileID: 8425788594472771957}
+  m_CorrespondingSourceObject: {fileID: 8617892153689689189, guid: 5834721c9704bc442874f91b67e6f66b, type: 3}
+  m_PrefabInstance: {fileID: 8936716185506778006}
   m_PrefabAsset: {fileID: 0}
