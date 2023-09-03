@@ -98,7 +98,7 @@ Transform:
   - {fileID: 1752568513846224967}
   - {fileID: 5513122810026397320}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7780215681746786736
 MonoBehaviour:
@@ -115,7 +115,10 @@ MonoBehaviour:
   waveStartPoint: {fileID: 5751746269940036931}
   waveEndPoint: {fileID: 1752568513846224967}
   teleportWave: {fileID: 407114102655712352}
+  activeMaterial: {fileID: 0}
+  inactiveMaterial: {fileID: 0}
   waveSpeed: 1
+  isTeleportActive: 0
 --- !u!1 &8956247369884254199
 GameObject:
   m_ObjectHideFlags: 0
@@ -126,6 +129,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5513122810026397320}
   - component: {fileID: 2607239104013997481}
+  - component: {fileID: 747827093498009747}
   m_Layer: 0
   m_Name: TeleportCollider
   m_TagString: Untagged
@@ -171,6 +175,19 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &747827093498009747
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8956247369884254199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907b3b52ec8a41aea265ce777397771f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  portalController: {fileID: 0}
 --- !u!1001 &677569433926189361
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -189,7 +206,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad57c35436c6b46429b424d5c5070439, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.72
+      value: 0.001
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ad57c35436c6b46429b424d5c5070439, type: 3}
       propertyPath: m_LocalPosition.z

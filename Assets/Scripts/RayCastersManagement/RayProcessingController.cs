@@ -36,6 +36,8 @@ public class RayProcessingController : MonoBehaviour
     [HideInInspector] public bool levelCompleted = false;
 
     [HideInInspector] public bool actionsExecuted = false;
+    
+    public Material reflectionMaterial;
 
     
     [System.Serializable]
@@ -53,7 +55,7 @@ public class RayProcessingController : MonoBehaviour
         rayActivationController = FindObjectOfType<RayActivationController>();
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (receiverState == ReceiverState.ActionExecuted && !actionsExecuted)
         {
@@ -82,7 +84,7 @@ public class RayProcessingController : MonoBehaviour
                 // Create the reflection line
                 if (currentReflectionLine == null)
                 {
-                    currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint);
+                    currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint, reflectionMaterial);
                 }
 
                 ReflectRay(hitPoint, incomingRay.direction, normal, 0);
@@ -186,7 +188,7 @@ public class RayProcessingController : MonoBehaviour
     }
 
 
-    public LineRenderer CreateReflectionLineRenderer(Vector3 start, Vector3 end)
+    public LineRenderer CreateReflectionLineRenderer(Vector3 start, Vector3 end, Material material = null)
     {
         Debug.Log("CreateReflectionLineRenderer called with start: " + start + ", end: " + end);
 
@@ -200,7 +202,7 @@ public class RayProcessingController : MonoBehaviour
             GameObject reflectionLineObject = new GameObject("ReflectionLine");
             reflectionLineObject.transform.SetParent(transform);
             lineRenderer = reflectionLineObject.AddComponent<LineRenderer>();
-            lineRenderer.material = new Material(Shader.Find("Standard"));
+            lineRenderer.material = material != null ? material : new Material(Shader.Find("Standard"));
             lineRenderer.startColor = Color.yellow;
             lineRenderer.endColor = Color.yellow;
             lineRenderer.startWidth = 0.01f;

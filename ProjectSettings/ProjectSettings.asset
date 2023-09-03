@@ -846,15 +846,15 @@ PlayerSettings:
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
   metroPackageName: yesclip2
-  metroPackageVersion: 
-  metroCertificatePath: 
+  metroPackageVersion: 1.0.0.0
+  metroCertificatePath: Assets/WSATestCertificate.pfx
   metroCertificatePassword: 
-  metroCertificateSubject: 
-  metroCertificateIssuer: 
-  metroCertificateNotAfter: 0000000000000000
+  metroCertificateSubject: DefaultCompany
+  metroCertificateIssuer: DefaultCompany
+  metroCertificateNotAfter: 0016bddbeafcda01
   metroApplicationDescription: yesclip2
   wsaImages: {}
-  metroTileShortName: 
+  metroTileShortName: yesclip2
   metroTileShowName: 0
   metroMediumTileShowName: 0
   metroLargeTileShowName: 0

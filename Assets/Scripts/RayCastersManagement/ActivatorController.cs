@@ -1,15 +1,23 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
-/// <summary>
-/// This class is used to control the activator object.
-/// The activator object is used to activate ray casting.
-/// </summary>
+[Serializable]
+public class FloatingAreaRayControllerPair
+{
+    public Collider floatingArea;
+    public RayActivationController rayActivationController;
+    public GameObject targetObject;
+    public Material targetGlowMaterial;
+}
+
 public class ActivatorController : XRGrabInteractable
 {
-    [Tooltip("Assign the RayActivationController object here.")] [SerializeField]
-    private RayActivationController rayActivationController;
+    [Tooltip("Assign the floating areas and their associated RayActivationController objects here.")]
+    [SerializeField]
+    private List<FloatingAreaRayControllerPair> floatingAreaRayControllerPairs;
 
     [Tooltip("Adjust the rotation speed of the activator object.")]
     public float rotationSpeed = 50f;
@@ -30,35 +38,18 @@ public class ActivatorController : XRGrabInteractable
     public AreaController areaController;
 
     private bool isSelectExitedCalled = false;
-    
-    [Tooltip("Assign a target GameObject to change its material when the ray is activated.")]
-    public GameObject targetObject;
-
-    [Tooltip("Assign a material for the target object when the ray is activated.")]
-    public Material targetGlowMaterial;
 
     private Material _targetOriginalMaterial;
     private MeshRenderer _targetRenderer;
+
+    private RayActivationController currentRayActivationController;
 
     protected override void Awake()
     {
         base.Awake();
         _activatorRenderer = GetComponent<MeshRenderer>();
         _rigidbody = GetComponent<Rigidbody>();
-        
-        if (targetObject != null)
-        {
-            _targetRenderer = targetObject.GetComponent<MeshRenderer>();
-            if (_targetRenderer != null)
-            {
-                _targetOriginalMaterial = _targetRenderer.material;
-            }
-            else
-            {
-                Debug.LogError("No MeshRenderer found on the target object.");
-            }
-        }
-        
+
         if (_activatorRenderer != null)
         {
             _activatorOriginalMaterial = _activatorRenderer.material;
@@ -82,15 +73,15 @@ public class ActivatorController : XRGrabInteractable
             transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
 
             // Activate ray if it's not already active
-            if (!_isRayActive)
+            if (!_isRayActive && currentRayActivationController != null)
             {
-                rayActivationController.ActivateRaycasting();
+                currentRayActivationController.ActivateRaycasting();
                 _isRayActive = true;
             }
         }
-        else if (_isRayActive) // Deactivate ray if previously active
+        else if (_isRayActive && currentRayActivationController != null) // Deactivate ray if previously active
         {
-            rayActivationController.DeactivateRaycasting();
+            currentRayActivationController.DeactivateRaycasting();
             _isRayActive = false;
         }
 
@@ -102,27 +93,39 @@ public class ActivatorController : XRGrabInteractable
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("ActivatorFloatingArea"))
+        // Find the correct RayActivationController based on the floating area
+        foreach (var pair in floatingAreaRayControllerPairs)
         {
-            if (other.transform.childCount > 0)
+            if (pair.floatingArea == other)
             {
-                _isInsideTrigger = true;
-                _rigidbody.useGravity = false;
-                _rigidbody.velocity = Vector3.zero;
-                _rigidbody.angularVelocity = Vector3.zero;
-                _activatorRenderer.material = activatorGlowMaterial;
-                _targetRenderer.material = targetGlowMaterial;
+                currentRayActivationController = pair.rayActivationController;
+                _targetRenderer = pair.targetObject.GetComponent<MeshRenderer>();
+                _targetOriginalMaterial = _targetRenderer.material;
+                _targetRenderer.material = pair.targetGlowMaterial;
+                break;
+            }
+        }
 
-                _targetTransform = other.transform.Find("Hovering Point");
-                if (_targetTransform == null)
-                {
-                    Debug.LogError("No child transform named 'Hovering Point' found under ActivatorFloatingArea.");
-                }
-            }
-            else
+        if (currentRayActivationController != null)
+        {
+            _isInsideTrigger = true;
+            _rigidbody.useGravity = false;
+            _rigidbody.velocity = Vector3.zero;
+            _rigidbody.angularVelocity = Vector3.zero;
+            _activatorRenderer.material = activatorGlowMaterial;
+
+            _targetTransform = other.transform.Find("Hovering Point");
+            if (_targetTransform == null)
             {
-                Debug.LogError("No child transform found under ActivatorFloatingArea.");
+                Debug.LogError("No child transform named 'Hovering Point' found under ActivatorFloatingArea.");
             }
+
+            currentRayActivationController.ActivateRaycasting();
+            _isRayActive = true;
+        }
+        else
+        {
+            Debug.LogError("No RayActivationController found for the floating area.");
         }
     }
 
@@ -137,11 +140,14 @@ public class ActivatorController : XRGrabInteractable
             _targetRenderer.material = _targetOriginalMaterial;
             _targetTransform = null;
 
-            rayActivationController.DeactivateRaycasting();
-            rayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
+            if (currentRayActivationController != null)
+            {
+                currentRayActivationController.DeactivateRaycasting();
+                currentRayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
+                _isRayActive = false;
+            }
         }
     }
-
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
@@ -155,30 +161,32 @@ public class ActivatorController : XRGrabInteractable
         isSelectExitedCalled = false;
     }
 
-protected override void OnSelectExited(SelectExitEventArgs args)
-{
-    if (isSelectExitedCalled)
+    protected override void OnSelectExited(SelectExitEventArgs args)
     {
-        return;
+        if (isSelectExitedCalled)
+        {
+            return;
+        }
+
+        base.OnSelectExited(args);
+        Debug.Log("OnSelectExited called, enabling gravity");
+        _rigidbody.useGravity = true;
+        _targetTransform = null;
+
+        _isRayActive = false;
+
+        StartCoroutine(DeactivateRaycastingWithDelay());
+
+        isSelectExitedCalled = true;
     }
-
-    base.OnSelectExited(args);
-    Debug.Log("OnSelectExited called, enabling gravity");
-    _rigidbody.useGravity = true;
-    _targetTransform = null;
-
-    _isRayActive = false;
-
-    StartCoroutine(DeactivateRaycastingWithDelay());
-
-    isSelectExitedCalled = true;
-}
-
 
     private IEnumerator DeactivateRaycastingWithDelay()
     {
         yield return new WaitForSeconds(1f); // adjust the delay as needed
-        rayActivationController.DeactivateRaycasting();
-        _isRayActive = false;
+        if (currentRayActivationController != null)
+        {
+            currentRayActivationController.DeactivateRaycasting();
+            _isRayActive = false;
+        }
     }
 }

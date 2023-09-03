@@ -8,6 +8,7 @@ public class PortalController : MonoBehaviour
     {
         public Portal portal;
         public Transform destination;
+        public TeleportAnimation teleportAnimation;
     }
 
     public List<PortalEntry> portals = new List<PortalEntry>();
@@ -26,9 +27,14 @@ public class PortalController : MonoBehaviour
                     rb.velocity = Vector3.zero;
                     rb.angularVelocity = Vector3.zero;
                 }
+
+                if (portalEntry.teleportAnimation != null)
+                {
+                    portalEntry.teleportAnimation.DeactivateTeleport();
+                }
+
                 return;
             }
         }
     }
-
 }

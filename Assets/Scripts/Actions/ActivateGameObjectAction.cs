@@ -10,6 +10,11 @@ public class ActivateGameObjectAction : ActionBase
 
     public override void RevertAction(GameObject targetObject)
     {
+        ScaleOnActivate scaleOnActivate = targetObject.GetComponent<ScaleOnActivate>();
+        if (scaleOnActivate != null)
+        {
+            scaleOnActivate.StartScaleDown();
+        }
         targetObject.SetActive(false);
     }
 }

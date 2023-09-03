@@ -10,11 +10,13 @@ public class RayActivationController : MonoBehaviour
     public RayProcessingController rayProcessingController;
 
     private LineRenderer _lineRenderer;
+    
+    public Material lineMaterial;
 
     void Awake()
     {
         _lineRenderer = raycastOrigin.gameObject.AddComponent<LineRenderer>();
-        _lineRenderer.material = new Material(Shader.Find("Standard"));
+        _lineRenderer.material = lineMaterial != null ? lineMaterial : new Material(Shader.Find("Standard"));
         _lineRenderer.startColor = Color.red;
         _lineRenderer.endColor = Color.red;
         _lineRenderer.startWidth = 0.01f;
@@ -25,11 +27,13 @@ public class RayActivationController : MonoBehaviour
 
     public void ActivateRaycasting()
     {
+        Debug.Log("ActivateRaycasting called");
         _lineRenderer.enabled = true;
     }
 
     public void DeactivateRaycasting()
     {
+        Debug.Log("DeactivateRaycasting called");
         _lineRenderer.enabled = false;
         rayProcessingController.ResetRayHit();
     }
@@ -44,6 +48,7 @@ public class RayActivationController : MonoBehaviour
 
     bool Raycast(Transform raycastOrigin, LineRenderer lineRenderer, LayerMask raycastMask)
     {
+        Debug.Log("Raycast called");
         Ray ray = new Ray(raycastOrigin.position, raycastOrigin.forward);
         RaycastHit hit;
         bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask);

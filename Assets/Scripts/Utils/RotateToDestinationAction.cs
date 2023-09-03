@@ -7,14 +7,16 @@ public class RotateToDestinationAction : MonoBehaviour
     {
         public GameObject targetObject;
         public float rotationAmount = 90f;
+        public float duration = 1.0f;
+        public Vector3 targetPosition;
     }
 
     public RotationObject[] objectsToRotate;
-    public float duration = 1.0f;
 
     private Quaternion[] initialRotations;
+    private Vector3[] initialPositions;
     private Quaternion[] targetRotations;
-    private float elapsedTime = 0;
+    private float[] elapsedTimes;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -25,19 +27,20 @@ public class RotateToDestinationAction : MonoBehaviour
         }
     }
 
-
     public void ExecuteAction()
     {
         initialRotations = new Quaternion[objectsToRotate.Length];
+        initialPositions = new Vector3[objectsToRotate.Length];
         targetRotations = new Quaternion[objectsToRotate.Length];
+        elapsedTimes = new float[objectsToRotate.Length];
 
         for (int i = 0; i < objectsToRotate.Length; i++)
         {
             initialRotations[i] = objectsToRotate[i].targetObject.transform.rotation;
+            initialPositions[i] = objectsToRotate[i].targetObject.transform.position;
             targetRotations[i] = Quaternion.Euler(objectsToRotate[i].targetObject.transform.eulerAngles + new Vector3(0, objectsToRotate[i].rotationAmount, 0));
+            elapsedTimes[i] = 0;
         }
-
-        elapsedTime = 0;
 
         StartCoroutine(Rotate());
     }
@@ -47,31 +50,42 @@ public class RotateToDestinationAction : MonoBehaviour
         for (int i = 0; i < objectsToRotate.Length; i++)
         {
             objectsToRotate[i].targetObject.transform.rotation = initialRotations[i];
+            objectsToRotate[i].targetObject.transform.position = initialPositions[i];
         }
     }
 
     private System.Collections.IEnumerator Rotate()
     {
-        while (elapsedTime < duration)
+        bool allRotationsCompleted = false;
+
+        while (!allRotationsCompleted)
         {
-            float t = elapsedTime / duration;
-            t = t * t * (3f - 2f * t); // Smooth step interpolation
+            allRotationsCompleted = true;
 
             for (int i = 0; i < objectsToRotate.Length; i++)
             {
-                objectsToRotate[i].targetObject.transform.rotation = Quaternion.Lerp(initialRotations[i], targetRotations[i], t);
+                if (elapsedTimes[i] < objectsToRotate[i].duration)
+                {
+                    allRotationsCompleted = false;
+
+                    float t = elapsedTimes[i] / objectsToRotate[i].duration;
+                    t = t * t * (3f - 2f * t); // Smooth step interpolation
+
+                    objectsToRotate[i].targetObject.transform.rotation = Quaternion.Lerp(initialRotations[i], targetRotations[i], t);
+                    objectsToRotate[i].targetObject.transform.position = Vector3.Lerp(initialPositions[i], objectsToRotate[i].targetPosition, t);
+
+                    elapsedTimes[i] += Time.deltaTime;
+                }
+                else
+                {
+                    objectsToRotate[i].targetObject.transform.rotation = targetRotations[i];
+                    objectsToRotate[i].targetObject.transform.position = objectsToRotate[i].targetPosition;
+                }
             }
 
-            elapsedTime += Time.deltaTime;
             yield return null;
-        }
-
-        for (int i = 0; i < objectsToRotate.Length; i++)
-        {
-            objectsToRotate[i].targetObject.transform.rotation = targetRotations[i];
         }
 
         gameObject.SetActive(false);
     }
-
 }
