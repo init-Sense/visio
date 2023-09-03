@@ -68,8 +68,15 @@ public class RayActivationController : MonoBehaviour
         else
         {
             lineRenderer.SetPosition(1, raycastOrigin.position + raycastOrigin.forward * 1000);
+
+            // Reset ray hit when the ray is no longer hitting the receiver
+            if (rayProcessingController != null)
+            {
+                rayProcessingController.ResetRayHit();
+            }
         }
 
         return hitSomething;
     }
+
 }
