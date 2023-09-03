@@ -32,14 +32,14 @@ public class RayProcessingController : MonoBehaviour
 
     private LineRenderer reflectionLineRenderer;
     public LineRenderer currentReflectionLine;
-    
+
     [HideInInspector] public bool levelCompleted = false;
 
     [HideInInspector] public bool actionsExecuted = false;
-    
+
     public Material reflectionMaterial;
 
-    
+
     [System.Serializable]
     public class ActionableObject
     {
@@ -47,7 +47,7 @@ public class RayProcessingController : MonoBehaviour
         public ActionBase actionBase;
         public float transparencyIncrement = 0.1f; // Default value
     }
-    
+
     private RayActivationController rayActivationController;
 
     private void Start()
@@ -65,7 +65,8 @@ public class RayProcessingController : MonoBehaviour
 
     private void CheckRayExit()
     {
-        Ray ray = new Ray(rayActivationController.raycastOrigin.position, rayActivationController.raycastOrigin.forward);
+        Ray ray = new Ray(rayActivationController.raycastOrigin.position,
+            rayActivationController.raycastOrigin.forward);
         RaycastHit hit;
         bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, rayActivationController.raycastMask);
 
@@ -117,8 +118,15 @@ public class RayProcessingController : MonoBehaviour
             RevertActions();
             receiverState = ReceiverState.PartialHit;
         }
+
+        // Reset ray hit if the ray is no longer hitting the mirror's surface
+        if (receiverState != ReceiverState.ActionExecuted && !Physics.Raycast(incomingRay))
+        {
+            ResetRayHit();
+        }
     }
-    
+
+
     private void ExecuteActionsAndResetRayHits(Ray incomingRay)
     {
         Debug.Log($"Receiver {gameObject.name} achieved required hits.");
@@ -127,7 +135,7 @@ public class RayProcessingController : MonoBehaviour
 
         isActivated = true;
         levelCompleted = true;
-        
+
 
         try
         {
@@ -153,11 +161,10 @@ public class RayProcessingController : MonoBehaviour
         if (reflectionCount >= reflectionLimit) return;
 
         Vector3 reflectedDirection = Vector3.Reflect(direction, normal);
-        Vector3 newOrigin = origin;
-        Ray ray = new Ray(newOrigin, reflectedDirection);
+        Ray ray = new Ray(origin, reflectedDirection);
         RaycastHit hit;
 
-        Vector3 endPoint = newOrigin + reflectedDirection * 1000; // default end point if no hit
+        Vector3 endPoint = origin + reflectedDirection * 1000; // default end point if no hit
 
         if (Physics.Raycast(ray, out hit))
         {
@@ -183,9 +190,12 @@ public class RayProcessingController : MonoBehaviour
         // Update the reflection line
         if (currentReflectionLine != null)
         {
+            currentReflectionLine.SetPosition(0, origin); // update start position
             currentReflectionLine.SetPosition(1, endPoint);
         }
     }
+
+
 
 
     public LineRenderer CreateReflectionLineRenderer(Vector3 start, Vector3 end, Material material = null)
