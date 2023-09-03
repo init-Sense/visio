@@ -44,6 +44,8 @@ public class ActivatorController : XRGrabInteractable
 
     private RayActivationController currentRayActivationController;
 
+    private Renderer _energyBallRenderer;
+
     protected override void Awake()
     {
         base.Awake();
@@ -57,6 +59,20 @@ public class ActivatorController : XRGrabInteractable
         else
         {
             Debug.LogError("No MeshRenderer found on the activator object.");
+        }
+
+        Transform energyBallTransform = transform.Find("EnergyBall");
+        if (energyBallTransform != null)
+        {
+            _energyBallRenderer = energyBallTransform.GetComponent<Renderer>();
+            if (_energyBallRenderer == null)
+            {
+                Debug.LogError("No Renderer found on the EnergyBall object.");
+            }
+        }
+        else
+        {
+            Debug.LogError("No child transform named 'EnergyBall' found under Activator.");
         }
     }
 
@@ -112,7 +128,10 @@ public class ActivatorController : XRGrabInteractable
             _rigidbody.useGravity = false;
             _rigidbody.velocity = Vector3.zero;
             _rigidbody.angularVelocity = Vector3.zero;
-            _activatorRenderer.material = activatorGlowMaterial;
+            if (_energyBallRenderer != null)
+            {
+                _energyBallRenderer.material = activatorGlowMaterial;
+            }
 
             _targetTransform = other.transform.Find("Hovering Point");
             if (_targetTransform == null)
@@ -136,7 +155,10 @@ public class ActivatorController : XRGrabInteractable
             Debug.Log("Exiting ActivatorFloatingArea, enabling gravity");
             _isInsideTrigger = false;
             _rigidbody.useGravity = true;
-            _activatorRenderer.material = _activatorOriginalMaterial;
+            if (_energyBallRenderer != null)
+            {
+                _energyBallRenderer.material = _activatorOriginalMaterial;
+            }
             _targetRenderer.material = _targetOriginalMaterial;
             _targetTransform = null;
 
