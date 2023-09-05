@@ -65,6 +65,8 @@ public class RayProcessingController : MonoBehaviour
 
     private void CheckRayExit()
     {
+        Debug.Log("Checking ray exit...");
+
         Ray ray = new Ray(rayActivationController.raycastOrigin.position, rayActivationController.raycastOrigin.forward);
         RaycastHit hit;
         bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, rayActivationController.raycastMask);
@@ -99,7 +101,7 @@ public class RayProcessingController : MonoBehaviour
             // Create the reflection line
             if (currentReflectionLine == null)
             {
-                currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint);
+                currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint, reflectionMaterial);
             }
 
             ReflectRay(hitPoint, incomingRay.direction, normal, 0);
@@ -194,10 +196,7 @@ public class RayProcessingController : MonoBehaviour
             currentReflectionLine.SetPosition(1, endPoint);
         }
     }
-
-
-
-
+    
     public LineRenderer CreateReflectionLineRenderer(Vector3 start, Vector3 end, Material material = null)
     {
         Debug.Log("CreateReflectionLineRenderer called with start: " + start + ", end: " + end);
@@ -231,6 +230,8 @@ public class RayProcessingController : MonoBehaviour
 
     public void DestroyReflectionLine()
     {
+        Debug.Log("Destroying reflection line...");
+
         if (currentReflectionLine != null)
         {
             Destroy(currentReflectionLine.gameObject);

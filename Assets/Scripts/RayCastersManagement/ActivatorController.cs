@@ -15,8 +15,7 @@ public class FloatingAreaRayControllerPair
 
 public class ActivatorController : XRGrabInteractable
 {
-    [Tooltip("Assign the floating areas and their associated RayActivationController objects here.")]
-    [SerializeField]
+    [Tooltip("Assign the floating areas and their associated RayActivationController objects here.")] [SerializeField]
     private List<FloatingAreaRayControllerPair> floatingAreaRayControllerPairs;
 
     [Tooltip("Adjust the rotation speed of the activator object.")]
@@ -148,9 +147,11 @@ public class ActivatorController : XRGrabInteractable
         }
     }
 
+    private float rayDeactivationDelay = 1f; // 1 second delay, adjust as needed
+
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("ActivatorFloatingArea"))
+        if (other.CompareTag("ActivatorFloatingArea") && _isRayActive)
         {
             Debug.Log("Exiting ActivatorFloatingArea, enabling gravity");
             _isInsideTrigger = false;
@@ -159,17 +160,25 @@ public class ActivatorController : XRGrabInteractable
             {
                 _energyBallRenderer.material = _activatorOriginalMaterial;
             }
+
             _targetRenderer.material = _targetOriginalMaterial;
             _targetTransform = null;
 
-            if (currentRayActivationController != null)
-            {
-                currentRayActivationController.DeactivateRaycasting();
-                currentRayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
-                _isRayActive = false;
-            }
+            StartCoroutine(DeactivateRayAfterDelay());
         }
     }
+
+    private IEnumerator DeactivateRayAfterDelay()
+    {
+        yield return new WaitForSeconds(rayDeactivationDelay);
+        if (!_isInsideTrigger && _isRayActive) // Double-check to ensure the activator is still outside the trigger
+        {
+            currentRayActivationController.DeactivateRaycasting();
+            currentRayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
+            _isRayActive = false;
+        }
+    }
+
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
