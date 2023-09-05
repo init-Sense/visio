@@ -38,13 +38,18 @@ public class RayActivationController : MonoBehaviour
         rayProcessingController.ResetRayHit();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (_lineRenderer.enabled)
         {
             Raycast(raycastOrigin, _lineRenderer, raycastMask);
         }
     }
+
+    private float resetCooldown = 0.5f; // Time in seconds before resetting the ray hit
+    private float lastHitTime;
+
+    private bool reflectionDestroyedThisFrame = false;
 
     bool Raycast(Transform raycastOrigin, LineRenderer lineRenderer, LayerMask raycastMask)
     {
@@ -54,7 +59,7 @@ public class RayActivationController : MonoBehaviour
         bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask);
 
         lineRenderer.SetPosition(0, raycastOrigin.position);
-
+    
         if (hitSomething)
         {
             lineRenderer.SetPosition(1, hit.point);
@@ -74,9 +79,22 @@ public class RayActivationController : MonoBehaviour
             {
                 rayProcessingController.ResetRayHit();
             }
+
+            // Clear any existing reflection if not already cleared this frame
+            if (!reflectionDestroyedThisFrame)
+            {
+                rayProcessingController.DestroyReflectionLine();
+                reflectionDestroyedThisFrame = true;
+            }
         }
 
         return hitSomething;
     }
+
+    void LateUpdate()
+    {
+        reflectionDestroyedThisFrame = false;
+    }
+
 
 }

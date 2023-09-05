@@ -61,13 +61,30 @@ public class RayProcessingController : MonoBehaviour
         {
             CheckRayExit();
         }
+    
+        CheckPrimaryRayHit();
+    }
+
+    private void CheckPrimaryRayHit()
+    {
+        Ray ray = new Ray(rayActivationController.raycastOrigin.position,
+            rayActivationController.raycastOrigin.forward);
+        RaycastHit hit;
+        bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, rayActivationController.raycastMask);
+
+        // Check if the ray is no longer hitting this specific receiver
+        if (!hitSomething || hit.collider.gameObject != gameObject)
+        {
+            DestroyReflectionLine();
+        }
     }
 
     private void CheckRayExit()
     {
         Debug.Log("Checking ray exit...");
 
-        Ray ray = new Ray(rayActivationController.raycastOrigin.position, rayActivationController.raycastOrigin.forward);
+        Ray ray = new Ray(rayActivationController.raycastOrigin.position,
+            rayActivationController.raycastOrigin.forward);
         RaycastHit hit;
         bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, rayActivationController.raycastMask);
 
@@ -80,31 +97,12 @@ public class RayProcessingController : MonoBehaviour
 
     public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal)
     {
+        // If the receiver is already in the ActionExecuted state or actions have been executed, 
+        // handle the reflection and return.
         if (receiverState == ReceiverState.ActionExecuted || actionsExecuted)
         {
-            if (enableReflection)
-            {
-                // Create the reflection line
-                if (currentReflectionLine == null)
-                {
-                    currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint, reflectionMaterial);
-                }
-
-                ReflectRay(hitPoint, incomingRay.direction, normal, 0);
-            }
-
+            HandleReflection(hitPoint, incomingRay.direction, normal);
             return;
-        }
-
-        if (enableReflection)
-        {
-            // Create the reflection line
-            if (currentReflectionLine == null)
-            {
-                currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint, reflectionMaterial);
-            }
-
-            ReflectRay(hitPoint, incomingRay.direction, normal, 0);
         }
 
         rayHits++;
@@ -121,10 +119,21 @@ public class RayProcessingController : MonoBehaviour
             receiverState = ReceiverState.PartialHit;
         }
 
-        // Reset ray hit if the ray is no longer hitting the mirror's surface
-        if (receiverState != ReceiverState.ActionExecuted && !Physics.Raycast(incomingRay))
+        // Handle reflection after processing the hit.
+        HandleReflection(hitPoint, incomingRay.direction, normal);
+    }
+
+    private void HandleReflection(Vector3 hitPoint, Vector3 incomingDirection, Vector3 normal)
+    {
+        if (enableReflection)
         {
-            ResetRayHit();
+            // Create the reflection line
+            if (currentReflectionLine == null)
+            {
+                currentReflectionLine = CreateReflectionLineRenderer(hitPoint, hitPoint, reflectionMaterial);
+            }
+
+            ReflectRay(hitPoint, incomingDirection, normal, 0);
         }
     }
 
@@ -137,7 +146,6 @@ public class RayProcessingController : MonoBehaviour
 
         isActivated = true;
         levelCompleted = true;
-
 
         try
         {
@@ -156,7 +164,7 @@ public class RayProcessingController : MonoBehaviour
 
         rayHits = 0;
     }
-
+    
     private void ReflectRay(Vector3 origin, Vector3 direction, Vector3 normal, int reflectionCount)
     {
         Debug.Log("ReflectRay called: reflectionCount = " + reflectionCount);
@@ -183,20 +191,22 @@ public class RayProcessingController : MonoBehaviour
                     hitReceiver.ProcessRayHit(hit.point, ray, hit.normal);
                 }
             }
+        
+            // Reflect off the hit surface
+            ReflectRay(hit.point, reflectedDirection, hit.normal, reflectionCount + 1);
         }
         else
         {
             Debug.Log("Ray did not hit any object");
         }
 
-        // Update the reflection line
         if (currentReflectionLine != null)
         {
             currentReflectionLine.SetPosition(0, origin); // update start position
             currentReflectionLine.SetPosition(1, endPoint);
         }
     }
-    
+
     public LineRenderer CreateReflectionLineRenderer(Vector3 start, Vector3 end, Material material = null)
     {
         Debug.Log("CreateReflectionLineRenderer called with start: " + start + ", end: " + end);
@@ -221,7 +231,6 @@ public class RayProcessingController : MonoBehaviour
 
         lineRenderer.useWorldSpace = true;
 
-        // Set positions for the line renderer
         lineRenderer.SetPosition(0, start);
         lineRenderer.SetPosition(1, end);
 
@@ -258,7 +267,6 @@ public class RayProcessingController : MonoBehaviour
         rayHits = 0;
         isActivated = false;
 
-        // Destroy the reflection line
         DestroyReflectionLine();
     }
 
