@@ -65,8 +65,7 @@ public class RayProcessingController : MonoBehaviour
 
     private void CheckRayExit()
     {
-        Ray ray = new Ray(rayActivationController.raycastOrigin.position,
-            rayActivationController.raycastOrigin.forward);
+        Ray ray = new Ray(rayActivationController.raycastOrigin.position, rayActivationController.raycastOrigin.forward);
         RaycastHit hit;
         bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, rayActivationController.raycastMask);
 
@@ -75,6 +74,7 @@ public class RayProcessingController : MonoBehaviour
             ResetRayHit();
         }
     }
+
 
     public void ProcessRayHit(Vector3 hitPoint, Ray incomingRay, Vector3 normal)
     {
@@ -155,8 +155,6 @@ public class RayProcessingController : MonoBehaviour
         rayHits = 0;
     }
 
-    private RayProcessingController lastHitReceiver;
-
     private void ReflectRay(Vector3 origin, Vector3 direction, Vector3 normal, int reflectionCount)
     {
         Debug.Log("ReflectRay called: reflectionCount = " + reflectionCount);
@@ -167,8 +165,6 @@ public class RayProcessingController : MonoBehaviour
         RaycastHit hit;
 
         Vector3 endPoint = origin + reflectedDirection * 1000; // default end point if no hit
-
-        bool hitValidReceiver = false;
 
         if (Physics.Raycast(ray, out hit))
         {
@@ -183,8 +179,6 @@ public class RayProcessingController : MonoBehaviour
                 if (hitReceiver.receiverState != ReceiverState.ActionExecuted)
                 {
                     hitReceiver.ProcessRayHit(hit.point, ray, hit.normal);
-                    hitValidReceiver = true;
-                    lastHitReceiver = hitReceiver;
                 }
             }
         }
@@ -199,14 +193,9 @@ public class RayProcessingController : MonoBehaviour
             currentReflectionLine.SetPosition(0, origin); // update start position
             currentReflectionLine.SetPosition(1, endPoint);
         }
-
-        // Reset ray hit if the reflected ray is no longer hitting a valid receiver
-        if (!hitValidReceiver && lastHitReceiver != null)
-        {
-            lastHitReceiver.ResetRayHit();
-            lastHitReceiver = null;
-        }
     }
+
+
 
 
     public LineRenderer CreateReflectionLineRenderer(Vector3 start, Vector3 end, Material material = null)
