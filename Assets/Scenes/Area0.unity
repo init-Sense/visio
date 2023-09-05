@@ -1463,6 +1463,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 198935359}
     m_Modifications:
+    - target: {fileID: 405615037251059837, guid: 5831a37dc47e68f42b03c0f284fbb140, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: 14832425138a3ab4b87efb6e1bdb6114, type: 3}
     - target: {fileID: 1910487395265450691, guid: 5831a37dc47e68f42b03c0f284fbb140, type: 3}
       propertyPath: m_Name
       value: IntangibleWall_M
