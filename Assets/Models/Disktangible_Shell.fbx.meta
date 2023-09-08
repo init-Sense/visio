@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: 045eecddac657ff4bba68d6a7d06526a
+guid: 5b2015731a5e8ab48b7258876959e2ce
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Disktangible_Shell
+    second: {fileID: 2100000, guid: 355ec4853ff8fe2449419b883815414f, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

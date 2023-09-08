@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: aeacfea11ec3e8b43813031e22163de1
+guid: e1854e44f33675d48b3b48d4595e0efb
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TeleportBase
+    second: {fileID: 2100000, guid: 51d9ceb76df8afb45a93481b265289bc, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

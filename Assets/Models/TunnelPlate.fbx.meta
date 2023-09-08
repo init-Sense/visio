@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: fb1a8d4ad1f0afc43a269693d07c825a
+guid: 50968e56a77901745b99e4f77b013607
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TunnelPlate
+    second: {fileID: 2100000, guid: 7a585e17ff1900d4bb65df0666da0e9f, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
