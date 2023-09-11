@@ -3,7 +3,12 @@ guid: ad57c35436c6b46429b424d5c5070439
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Energy_ON_Transparent
+    second: {fileID: 2100000, guid: f4a11cde771bb6a4786d75ea5f611a43, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

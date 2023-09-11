@@ -3,7 +3,17 @@ guid: 98854b625cca84246bf14646001c74e4
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Disktangible
+    second: {fileID: 2100000, guid: b80918d55afd3234d9f07347cd45c9c5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: DisktangibleHole
+    second: {fileID: 2100000, guid: 922b0426b7272d54abd5e97367757d7c, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

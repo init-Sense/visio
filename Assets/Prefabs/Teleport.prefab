@@ -98,7 +98,7 @@ Transform:
   - {fileID: 1752568513846224967}
   - {fileID: 5513122810026397320}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7780215681746786736
 MonoBehaviour:
@@ -244,14 +244,14 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: ad57c35436c6b46429b424d5c5070439, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: -876546973899608171, guid: d65d9974f1d03e243a2983411bb8d492, type: 3}
+      objectReference: {fileID: -876546973899608171, guid: 98a14c3ec6147584197c0e24145e7804, type: 3}
     - target: {fileID: -5754084199372789682, guid: ad57c35436c6b46429b424d5c5070439, type: 3}
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 4852616283235110912, guid: 183ddbc4738cd944b92307a5c0724889, type: 3}
     - target: {fileID: 919132149155446097, guid: ad57c35436c6b46429b424d5c5070439, type: 3}
       propertyPath: m_Name
-      value: TeleportWave
+      value: TeleportWaves
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -323,7 +323,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: aeacfea11ec3e8b43813031e22163de1, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: -898209198899211921, guid: 080b974f214f72e4e810477318a58715, type: 3}
+      objectReference: {fileID: 2100000, guid: 51d9ceb76df8afb45a93481b265289bc, type: 2}
     - target: {fileID: -5754084199372789682, guid: aeacfea11ec3e8b43813031e22163de1, type: 3}
       propertyPath: m_Mesh
       value: 
@@ -427,7 +427,11 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: a341688b2d54b584796304a23252a5ee, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: -876546973899608171, guid: d65d9974f1d03e243a2983411bb8d492, type: 3}
+      objectReference: {fileID: -876546973899608171, guid: 9e86ed02391c7ef459430e2a86b64239, type: 3}
+    - target: {fileID: -5754084199372789682, guid: a341688b2d54b584796304a23252a5ee, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 7765133088176977663, guid: a341688b2d54b584796304a23252a5ee, type: 3}
     - target: {fileID: 919132149155446097, guid: a341688b2d54b584796304a23252a5ee, type: 3}
       propertyPath: m_Name
       value: TeleportDisk

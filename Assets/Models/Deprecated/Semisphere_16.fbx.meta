@@ -3,7 +3,12 @@ guid: f433c157daea8464896ef72e9f4b5cec
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Semisphere
+    second: {fileID: 2100000, guid: c5849052bb0738e4cb857c0fea12ef63, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

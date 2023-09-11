@@ -3,7 +3,12 @@ guid: 727cdc0859c6e274d87b834b0d85e5a7
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Pearl
+    second: {fileID: 2100000, guid: 0b980f51ca1eec241b786f987a108d2a, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

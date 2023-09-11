@@ -3,7 +3,12 @@ guid: 348a5a76af0e4044a96aa9974d6e99d0
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EnergyWall_ON
+    second: {fileID: 2100000, guid: 51011a67014560e4280faf0d472b7d94, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

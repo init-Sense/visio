@@ -3,7 +3,12 @@ guid: c67f8d0bb16709446b512341975a0da1
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Rayceiver_ON
+    second: {fileID: 2100000, guid: 796f1c16e9116c24587c819b88cb50e3, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

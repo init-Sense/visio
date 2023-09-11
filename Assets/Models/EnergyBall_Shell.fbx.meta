@@ -3,7 +3,12 @@ guid: 554387c0653bd294aa5b2ab9fe4489b8
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: EnergyBall_Shell
+    second: {fileID: 2100000, guid: a0421d9bcee35a04297535280359c2bc, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

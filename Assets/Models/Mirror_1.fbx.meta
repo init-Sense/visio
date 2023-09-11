@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: f2d4960b8660df14d9d57698b8f7fa75
+guid: e86e773f4f0f9314096757725980e66f
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Chrome
+    second: {fileID: 2100000, guid: 9b148ef71d15cca458613d91a19c339e, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

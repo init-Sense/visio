@@ -3,7 +3,12 @@ guid: f3cb42b32e063464a84b66f8e6ae9890
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TurretDynamic_Stand
+    second: {fileID: 2100000, guid: b2c8f669282c3ee47ba172a82028ad86, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

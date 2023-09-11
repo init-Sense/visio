@@ -3,7 +3,12 @@ guid: b3cede94b3ebffc4986a48b60aaf054f
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Chrome
+    second: {fileID: 2100000, guid: dc5e84d656ca90644a2fd13926543780, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
