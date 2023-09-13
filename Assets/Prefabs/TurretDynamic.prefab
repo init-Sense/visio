@@ -268,7 +268,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 732dd04ee0c6f274cb7a1c415cd83003, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 05ac81a957f0606449f548485833e3eb, type: 2}
+      objectReference: {fileID: -876546973899608171, guid: 4861510bd2d940b44a22276c20f478ba, type: 3}
     - target: {fileID: 919132149155446097, guid: 732dd04ee0c6f274cb7a1c415cd83003, type: 3}
       propertyPath: m_Name
       value: TurretDynamic_Sphere
@@ -477,7 +477,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: 875335f2367c5c548a67fb805c010d29, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 2b2caafd166fecc49b25794417f4c6ba, type: 2}
+      objectReference: {fileID: -876546973899608171, guid: 5321485fa27c1e742a9f6e1bfa9a1c55, type: 3}
     - target: {fileID: 919132149155446097, guid: 875335f2367c5c548a67fb805c010d29, type: 3}
       propertyPath: m_Name
       value: TurretDynamic_Stand
