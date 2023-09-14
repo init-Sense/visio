@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
@@ -26,6 +27,13 @@ public class ActivatorController : XRGrabInteractable
 
     [Tooltip("Assign a material for the activator when triggered. This is optional.")]
     public Material activatorGlowMaterial;
+
+    [Tooltip("Assign a clip to play while the ray is active.")]
+    public AudioClip rayActiveLoopClip;
+
+    private AudioSource _audioSource;
+    
+    private bool isAudioPlaying = false;
 
     private Material _activatorOriginalMaterial;
     private MeshRenderer _activatorRenderer;
@@ -60,6 +68,11 @@ public class ActivatorController : XRGrabInteractable
             Debug.LogError("No MeshRenderer found on the activator object.");
         }
 
+        _audioSource = gameObject.AddComponent<AudioSource>();
+        _audioSource.loop = true;
+        _audioSource.spatialBlend = 1.0f; // Make the sound effects source positional
+        _audioSource.transform.position = transform.position; // Set the position to the center of the activator
+
         Transform energyBallTransform = transform.Find("EnergyBall");
         if (energyBallTransform != null)
         {
@@ -80,24 +93,24 @@ public class ActivatorController : XRGrabInteractable
         if (_targetTransform == null || !_isInsideTrigger)
             return;
 
+        if (_isRayActive && rayActiveLoopClip != null && !isAudioPlaying)
+        {
+            _audioSource.clip = rayActiveLoopClip;
+            _audioSource.Play();
+            isAudioPlaying = true;
+        }
+        else if (!_isRayActive && isAudioPlaying) // If the ray is not active, stop playing the clip
+        {
+            _audioSource.Stop();
+            isAudioPlaying = false;
+        }
+
         if (_isInsideTrigger)
         {
             // Float and rotate the activator towards the target transform.
             transform.position = Vector3.Lerp(transform.position, _targetTransform.position,
                 Time.deltaTime * centeringSpeed);
             transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
-
-            // Activate ray if it's not already active
-            if (!_isRayActive && currentRayActivationController != null)
-            {
-                currentRayActivationController.ActivateRaycasting();
-                _isRayActive = true;
-            }
-        }
-        else if (_isRayActive && currentRayActivationController != null) // Deactivate ray if previously active
-        {
-            currentRayActivationController.DeactivateRaycasting();
-            _isRayActive = false;
         }
 
         if (_rigidbody.useGravity)
@@ -149,36 +162,60 @@ public class ActivatorController : XRGrabInteractable
 
     private float rayDeactivationDelay = 1f; // 1 second delay, adjust as needed
 
+    Coroutine deactivateCoroutine;
+
+
     void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("ActivatorFloatingArea") && _isRayActive)
+        // Ensure it's the correct trigger that is exited
+        foreach (var pair in floatingAreaRayControllerPairs)
         {
-            Debug.Log("Exiting ActivatorFloatingArea, enabling gravity");
-            _isInsideTrigger = false;
-            _rigidbody.useGravity = true;
-            if (_energyBallRenderer != null)
+            if (pair.floatingArea == other)
             {
-                _energyBallRenderer.material = _activatorOriginalMaterial;
+                Debug.Log("Exiting ActivatorFloatingArea, enabling gravity");
+                _isInsideTrigger = false;
+                _rigidbody.useGravity = true;
+                if (_energyBallRenderer != null)
+                {
+                    _energyBallRenderer.material = _activatorOriginalMaterial;
+                }
+
+                if (deactivateCoroutine != null)
+                {
+                    StopCoroutine(deactivateCoroutine);
+                }
+
+                deactivateCoroutine = StartCoroutine(DeactivateRayAfterDelay());
+                break;
             }
-
-            _targetRenderer.material = _targetOriginalMaterial;
-            _targetTransform = null;
-
-            StartCoroutine(DeactivateRayAfterDelay());
         }
     }
+
 
     private IEnumerator DeactivateRayAfterDelay()
     {
         yield return new WaitForSeconds(rayDeactivationDelay);
-        if (!_isInsideTrigger && _isRayActive) // Double-check to ensure the activator is still outside the trigger
+
+        if (!_isInsideTrigger && _isRayActive)
         {
             currentRayActivationController.DeactivateRaycasting();
             currentRayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
             _isRayActive = false;
         }
-    }
 
+        if (_targetRenderer != null)
+        {
+            _targetRenderer.material = _targetOriginalMaterial; // Reset to the original material
+            _targetRenderer = null;
+            _targetOriginalMaterial = null;
+        }
+
+        if (_audioSource.isPlaying)
+        {
+            _audioSource.Stop();
+            isAudioPlaying = false;
+        }
+    }
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
@@ -186,8 +223,6 @@ public class ActivatorController : XRGrabInteractable
         Debug.Log("OnSelectEntered called, disabling gravity");
         _rigidbody.useGravity = false;
         _targetTransform = args.interactable.transform;
-
-        _isRayActive = true;
 
         isSelectExitedCalled = false;
     }
@@ -204,20 +239,6 @@ public class ActivatorController : XRGrabInteractable
         _rigidbody.useGravity = true;
         _targetTransform = null;
 
-        _isRayActive = false;
-
-        StartCoroutine(DeactivateRaycastingWithDelay());
-
         isSelectExitedCalled = true;
-    }
-
-    private IEnumerator DeactivateRaycastingWithDelay()
-    {
-        yield return new WaitForSeconds(1f); // adjust the delay as needed
-        if (currentRayActivationController != null)
-        {
-            currentRayActivationController.DeactivateRaycasting();
-            _isRayActive = false;
-        }
     }
 }

@@ -36,6 +36,8 @@ public class RayActivationController : MonoBehaviour
         Debug.Log("DeactivateRaycasting called");
         _lineRenderer.enabled = false;
         rayProcessingController.ResetRayHit();
+        
+        
     }
 
     void FixedUpdate()
