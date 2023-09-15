@@ -121,6 +121,8 @@ public class ActivatorController : XRGrabInteractable
 
     void OnTriggerEnter(Collider other)
     {
+        Debug.Log("OnTriggerEnter called with collider: " + other.name);
+
         // Find the correct RayActivationController based on the floating area
         foreach (var pair in floatingAreaRayControllerPairs)
         {
@@ -140,6 +142,9 @@ public class ActivatorController : XRGrabInteractable
             _rigidbody.useGravity = false;
             _rigidbody.velocity = Vector3.zero;
             _rigidbody.angularVelocity = Vector3.zero;
+            
+            Debug.Log("RayActivationController found: " + currentRayActivationController.name);
+            
             if (_energyBallRenderer != null)
             {
                 _energyBallRenderer.material = activatorGlowMaterial;
@@ -167,6 +172,8 @@ public class ActivatorController : XRGrabInteractable
 
     void OnTriggerExit(Collider other)
     {
+        Debug.Log("OnTriggerExit called with collider: " + other.name);
+        
         // Ensure it's the correct trigger that is exited
         foreach (var pair in floatingAreaRayControllerPairs)
         {
@@ -198,9 +205,16 @@ public class ActivatorController : XRGrabInteractable
 
         if (!_isInsideTrigger && _isRayActive)
         {
-            currentRayActivationController.DeactivateRaycasting();
-            currentRayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
-            _isRayActive = false;
+            if (currentRayActivationController != null)
+            {
+                currentRayActivationController.DeactivateRaycasting();
+                currentRayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
+                _isRayActive = false;
+            }
+            else
+            {
+                Debug.LogError("currentRayActivationController is null.");
+            }
         }
 
         if (_targetRenderer != null)
@@ -215,7 +229,10 @@ public class ActivatorController : XRGrabInteractable
             _audioSource.Stop();
             isAudioPlaying = false;
         }
+
+        currentRayActivationController = null; // Set to null here after using it in the coroutine
     }
+
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {

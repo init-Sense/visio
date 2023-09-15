@@ -239,7 +239,7 @@ public class RayProcessingController : MonoBehaviour
 
     public void DestroyReflectionLine()
     {
-        Debug.Log("Destroying reflection line...");
+        //Debug.Log("Destroying reflection line...");
 
         if (currentReflectionLine != null)
         {
