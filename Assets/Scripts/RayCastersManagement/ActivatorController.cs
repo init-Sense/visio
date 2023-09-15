@@ -209,12 +209,12 @@ public class ActivatorController : XRGrabInteractable
             {
                 currentRayActivationController.DeactivateRaycasting();
                 currentRayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
-                _isRayActive = false;
             }
             else
             {
                 Debug.LogError("currentRayActivationController is null.");
             }
+            _isRayActive = false;
         }
 
         if (_targetRenderer != null)
@@ -229,9 +229,8 @@ public class ActivatorController : XRGrabInteractable
             _audioSource.Stop();
             isAudioPlaying = false;
         }
-
-        currentRayActivationController = null; // Set to null here after using it in the coroutine
     }
+
 
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)

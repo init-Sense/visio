@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 
+
 public class DiskTangibleController : XRGrabInteractable
 {
     private bool _isInsideTrigger = false;

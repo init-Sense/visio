@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4979742803791967625}
-  - component: {fileID: 7780215681746786736}
   m_Layer: 0
   m_Name: Teleport_OFF
   m_TagString: Untagged
@@ -34,26 +33,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7780215681746786736
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8099055871069460343}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19c3e3ddc74b4724b9c1dddb23131aa2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  waveStartPoint: {fileID: 0}
-  waveEndPoint: {fileID: 0}
-  teleportWave: {fileID: 0}
-  teleportDisk: {fileID: 0}
-  activeMaterial: {fileID: 0}
-  inactiveMaterial: {fileID: 0}
-  waveSpeed: 1
-  isTeleportActive: 0
 --- !u!1 &8956247369884254199
 GameObject:
   m_ObjectHideFlags: 0
@@ -178,7 +157,7 @@ PrefabInstance:
     - target: {fileID: -7511558181221131132, guid: aeacfea11ec3e8b43813031e22163de1, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 51d9ceb76df8afb45a93481b265289bc, type: 2}
+      objectReference: {fileID: -876546973899608171, guid: 99e828dde670cde4eb01d07041dd855f, type: 3}
     - target: {fileID: -5754084199372789682, guid: aeacfea11ec3e8b43813031e22163de1, type: 3}
       propertyPath: m_Mesh
       value: 

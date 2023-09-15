@@ -10,13 +10,13 @@ public class RotateToDestinationAction : MonoBehaviour
         public float duration = 1.0f;
         public Vector3 targetPosition;
 
-        public AudioClip startMoveClip;
-        public AudioClip movingClip;
-        public AudioClip arriveMoveClip;
-        
-        public AudioClip startRotateClip;
-        public AudioClip rotatingClip;
-        public AudioClip stopRotateClip;
+        // public AudioClip startMoveClip;
+        // public AudioClip movingClip;
+        // public AudioClip arriveMoveClip;
+        //
+        // public AudioClip startRotateClip;
+        // public AudioClip rotatingClip;
+        // public AudioClip stopRotateClip;
     }
 
     public RotationObject[] objectsToRotate;
@@ -82,16 +82,16 @@ private System.Collections.IEnumerator Rotate()
                     objectsToRotate[i].targetObject.transform.position = Vector3.Lerp(initialPositions[i], objectsToRotate[i].targetPosition, t);
 
                     // Play the moving and rotating clips
-                    if (elapsedTimes[i] == 0)
-                    {
-                        AudioSource.PlayClipAtPoint(objectsToRotate[i].startMoveClip, objectsToRotate[i].targetObject.transform.position);
-                        AudioSource.PlayClipAtPoint(objectsToRotate[i].startRotateClip, objectsToRotate[i].targetObject.transform.position);
-                    }
-                    else
-                    {
-                        AudioSource.PlayClipAtPoint(objectsToRotate[i].movingClip, objectsToRotate[i].targetObject.transform.position);
-                        AudioSource.PlayClipAtPoint(objectsToRotate[i].rotatingClip, objectsToRotate[i].targetObject.transform.position, 1.0f); // Increase volume for far away pivot point
-                    }
+                    // if (elapsedTimes[i] == 0)
+                    // {
+                    //     AudioSource.PlayClipAtPoint(objectsToRotate[i].startMoveClip, objectsToRotate[i].targetObject.transform.position);
+                    //     AudioSource.PlayClipAtPoint(objectsToRotate[i].startRotateClip, objectsToRotate[i].targetObject.transform.position);
+                    // }
+                    // else
+                    // {
+                    //     AudioSource.PlayClipAtPoint(objectsToRotate[i].movingClip, objectsToRotate[i].targetObject.transform.position);
+                    //     AudioSource.PlayClipAtPoint(objectsToRotate[i].rotatingClip, objectsToRotate[i].targetObject.transform.position, 1.0f); // Increase volume for far away pivot point
+                    // }
 
                     elapsedTimes[i] += Time.deltaTime;
                 }
@@ -100,9 +100,9 @@ private System.Collections.IEnumerator Rotate()
                     objectsToRotate[i].targetObject.transform.rotation = targetRotations[i];
                     objectsToRotate[i].targetObject.transform.position = objectsToRotate[i].targetPosition;
 
-                    // Play the arrive and stop rotating clips
-                    AudioSource.PlayClipAtPoint(objectsToRotate[i].arriveMoveClip, objectsToRotate[i].targetObject.transform.position);
-                    AudioSource.PlayClipAtPoint(objectsToRotate[i].stopRotateClip, objectsToRotate[i].targetObject.transform.position);
+                    // // Play the arrive and stop rotating clips
+                    // AudioSource.PlayClipAtPoint(objectsToRotate[i].arriveMoveClip, objectsToRotate[i].targetObject.transform.position);
+                    // AudioSource.PlayClipAtPoint(objectsToRotate[i].stopRotateClip, objectsToRotate[i].targetObject.transform.position);
                 }
             }
 
