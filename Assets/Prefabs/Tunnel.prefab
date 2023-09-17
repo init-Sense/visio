@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8777615882406483236}
   - component: {fileID: 2720974918117191633}
   m_Layer: 0
-  m_Name: TunnelPlate (5)
+  m_Name: TunnelPlate 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 1724539438735194028}
   - component: {fileID: 3461645450860725094}
   m_Layer: 0
-  m_Name: TunnelPlate
+  m_Name: TunnelPlate 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -178,7 +178,7 @@ GameObject:
   - component: {fileID: 750265489527575710}
   - component: {fileID: 7636561682654503977}
   m_Layer: 0
-  m_Name: TunnelPlate (3)
+  m_Name: TunnelPlate 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -371,7 +371,7 @@ MonoBehaviour:
   - targetObject: {fileID: 0}
     rotationAmount: -73
     duration: 20
-    targetPosition: {x: 0, y: 0, z: 0}
+    targetPosition: {fileID: 0}
 --- !u!1 &8512886917853069964
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,7 +383,7 @@ GameObject:
   - component: {fileID: 3416150247766418505}
   - component: {fileID: 918793361479608953}
   m_Layer: 0
-  m_Name: Pivot
+  m_Name: Tunnel Pivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

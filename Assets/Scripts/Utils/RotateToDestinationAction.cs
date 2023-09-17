@@ -8,7 +8,7 @@ public class RotateToDestinationAction : MonoBehaviour
         public GameObject targetObject;
         public float rotationAmount = 90f;
         public float duration = 1.0f;
-        public Vector3 targetPosition;
+        public Transform targetPosition;
 
         // public AudioClip startMoveClip;
         // public AudioClip movingClip;
@@ -62,53 +62,64 @@ public class RotateToDestinationAction : MonoBehaviour
     }
 
 private System.Collections.IEnumerator Rotate()
+{
+    bool allRotationsCompleted = false;
+
+    while (!allRotationsCompleted)
     {
-        bool allRotationsCompleted = false;
+        allRotationsCompleted = true;
 
-        while (!allRotationsCompleted)
+        for (int i = 0; i < objectsToRotate.Length; i++)
         {
-            allRotationsCompleted = true;
-
-            for (int i = 0; i < objectsToRotate.Length; i++)
+            if (elapsedTimes[i] < objectsToRotate[i].duration)
             {
-                if (elapsedTimes[i] < objectsToRotate[i].duration)
+                allRotationsCompleted = false;
+
+                float t = elapsedTimes[i] / objectsToRotate[i].duration;
+                t = t * t * (3f - 2f * t); // Smooth step interpolation
+                
+                objectsToRotate[i].targetObject.transform.rotation = Quaternion.Lerp(initialRotations[i], targetRotations[i], t);
+                
+                // Check if targetPosition is not null before using it
+                if (objectsToRotate[i].targetPosition != null)
                 {
-                    allRotationsCompleted = false;
-
-                    float t = elapsedTimes[i] / objectsToRotate[i].duration;
-                    t = t * t * (3f - 2f * t); // Smooth step interpolation
-
-                    objectsToRotate[i].targetObject.transform.rotation = Quaternion.Lerp(initialRotations[i], targetRotations[i], t);
-                    objectsToRotate[i].targetObject.transform.position = Vector3.Lerp(initialPositions[i], objectsToRotate[i].targetPosition, t);
-
-                    // Play the moving and rotating clips
-                    // if (elapsedTimes[i] == 0)
-                    // {
-                    //     AudioSource.PlayClipAtPoint(objectsToRotate[i].startMoveClip, objectsToRotate[i].targetObject.transform.position);
-                    //     AudioSource.PlayClipAtPoint(objectsToRotate[i].startRotateClip, objectsToRotate[i].targetObject.transform.position);
-                    // }
-                    // else
-                    // {
-                    //     AudioSource.PlayClipAtPoint(objectsToRotate[i].movingClip, objectsToRotate[i].targetObject.transform.position);
-                    //     AudioSource.PlayClipAtPoint(objectsToRotate[i].rotatingClip, objectsToRotate[i].targetObject.transform.position, 1.0f); // Increase volume for far away pivot point
-                    // }
-
-                    elapsedTimes[i] += Time.deltaTime;
+                    objectsToRotate[i].targetObject.transform.position = Vector3.Lerp(initialPositions[i], objectsToRotate[i].targetPosition.position, t);
                 }
-                else
-                {
-                    objectsToRotate[i].targetObject.transform.rotation = targetRotations[i];
-                    objectsToRotate[i].targetObject.transform.position = objectsToRotate[i].targetPosition;
 
-                    // // Play the arrive and stop rotating clips
-                    // AudioSource.PlayClipAtPoint(objectsToRotate[i].arriveMoveClip, objectsToRotate[i].targetObject.transform.position);
-                    // AudioSource.PlayClipAtPoint(objectsToRotate[i].stopRotateClip, objectsToRotate[i].targetObject.transform.position);
-                }
+                // Play the moving and rotating clips
+                // if (elapsedTimes[i] == 0)
+                // {
+                //     AudioSource.PlayClipAtPoint(objectsToRotate[i].startMoveClip, objectsToRotate[i].targetObject.transform.position);
+                //     AudioSource.PlayClipAtPoint(objectsToRotate[i].startRotateClip, objectsToRotate[i].targetObject.transform.position);
+                // }
+                // else
+                // {
+                //     AudioSource.PlayClipAtPoint(objectsToRotate[i].movingClip, objectsToRotate[i].targetObject.transform.position);
+                //     AudioSource.PlayClipAtPoint(objectsToRotate[i].rotatingClip, objectsToRotate[i].targetObject.transform.position, 1.0f); // Increase volume for far away pivot point
+                // }
+
+                elapsedTimes[i] += Time.deltaTime;
             }
+            else
+            {
+                objectsToRotate[i].targetObject.transform.rotation = targetRotations[i];
+                
+                // Check if targetPosition is not null before using it
+                if (objectsToRotate[i].targetPosition != null)
+                {
+                    objectsToRotate[i].targetObject.transform.position = objectsToRotate[i].targetPosition.position;
+                }
 
-            yield return null;
+                // // Play the arrive and stop rotating clips
+                // AudioSource.PlayClipAtPoint(objectsToRotate[i].arriveMoveClip, objectsToRotate[i].targetObject.transform.position);
+                // AudioSource.PlayClipAtPoint(objectsToRotate[i].stopRotateClip, objectsToRotate[i].targetObject.transform.position);
+            }
         }
 
-        gameObject.SetActive(false);
+        yield return null;
     }
+
+    gameObject.SetActive(false);
+}
+
 }
