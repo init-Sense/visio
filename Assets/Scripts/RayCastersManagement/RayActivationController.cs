@@ -93,13 +93,8 @@ public class RayActivationController : MonoBehaviour
     }
 
 
-
-
-
     void LateUpdate()
     {
         reflectionDestroyedThisFrame = false;
     }
-
-
 }
