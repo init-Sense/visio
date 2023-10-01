@@ -6,7 +6,7 @@ public class SetMaterialAction : ActionBase
     public Material material;
     public Material defaultMaterial;
 
-    public override void ExecuteAction(GameObject targetObject, Ray incomingRay, float transparencyIncrement = 0f)
+    public override void ExecuteAction(GameObject targetObject, Ray incomingRay)
     {
         targetObject.GetComponent<Renderer>().material = material;
     }

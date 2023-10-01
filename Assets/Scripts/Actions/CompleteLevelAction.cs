@@ -5,7 +5,7 @@ public class CompleteLevelAction : ActionBase
 {
     private bool isReverted = false;
 
-    public override void ExecuteAction(GameObject targetObject, Ray incomingRay, float transparencyIncrement = 0f)
+    public override void ExecuteAction(GameObject targetObject, Ray incomingRay)
     {
         AreaController areaController = targetObject.GetComponent<AreaController>();
         if (areaController != null)

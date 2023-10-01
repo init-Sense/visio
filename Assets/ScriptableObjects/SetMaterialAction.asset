@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c36de9f13974187bdd3a450b40c1f2a, type: 3}
   m_Name: SetMaterialAction
   m_EditorClassIdentifier: 
-  material: {fileID: -876546973899608171, guid: d65d9974f1d03e243a2983411bb8d492, type: 3}
-  defaultMaterial: {fileID: -876546973899608171, guid: 9732afaac31ad7d4bbfc0e859e1e6de7, type: 3}
+  material: {fileID: -876546973899608171, guid: 9e86ed02391c7ef459430e2a86b64239, type: 3}
+  defaultMaterial: {fileID: -876546973899608171, guid: f3d8be85577c8054e8628493a12e3ef0, type: 3}

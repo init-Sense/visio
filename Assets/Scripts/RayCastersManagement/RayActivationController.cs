@@ -10,7 +10,7 @@ public class RayActivationController : MonoBehaviour
     public RayProcessingController rayProcessingController;
 
     private LineRenderer _lineRenderer;
-    
+
     public Material lineMaterial;
 
     void Awake()
@@ -36,17 +36,22 @@ public class RayActivationController : MonoBehaviour
         Debug.Log("DeactivateRaycasting called");
         _lineRenderer.enabled = false;
         rayProcessingController.ResetRayHit();
-        
-        
+
+
     }
 
     void FixedUpdate()
     {
         if (_lineRenderer.enabled)
         {
-            Raycast(raycastOrigin, _lineRenderer, raycastMask);
+            bool hitSomething = Raycast(raycastOrigin, _lineRenderer, raycastMask);
+            if (!hitSomething)
+            {
+                rayProcessingController.DestroyReflectionLine();
+            }
         }
     }
+
 
     private float resetCooldown = 0.5f; // Time in seconds before resetting the ray hit
     private float lastHitTime;
@@ -61,7 +66,7 @@ public class RayActivationController : MonoBehaviour
         bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask);
 
         lineRenderer.SetPosition(0, raycastOrigin.position);
-    
+
         if (hitSomething)
         {
             lineRenderer.SetPosition(1, hit.point);
@@ -71,27 +76,25 @@ public class RayActivationController : MonoBehaviour
             {
                 hitReceiver.ProcessRayHit(hit.point, ray, hit.normal);
             }
+
+            // If the ray hits an object with the "Exit" tag or exits the reflective surface
+            if (hit.collider.CompareTag("Exit") || hitReceiver == null)
+            {
+                rayProcessingController.DestroyReflectionLine();
+            }
         }
         else
         {
             lineRenderer.SetPosition(1, raycastOrigin.position + raycastOrigin.forward * 1000);
-
-            // Reset ray hit when the ray is no longer hitting the receiver
-            if (rayProcessingController != null)
-            {
-                rayProcessingController.ResetRayHit();
-            }
-
-            // Clear any existing reflection if not already cleared this frame
-            if (!reflectionDestroyedThisFrame)
-            {
-                rayProcessingController.DestroyReflectionLine();
-                reflectionDestroyedThisFrame = true;
-            }
+            rayProcessingController.DestroyReflectionLine();
         }
 
         return hitSomething;
     }
+
+
+
+
 
     void LateUpdate()
     {

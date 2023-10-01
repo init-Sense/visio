@@ -45,7 +45,6 @@ public class RayProcessingController : MonoBehaviour
     {
         public GameObject targetObject;
         public ActionBase actionBase;
-        public float transparencyIncrement = 0.1f; // Default value
     }
 
     private RayActivationController rayActivationController;
@@ -151,7 +150,7 @@ public class RayProcessingController : MonoBehaviour
         {
             foreach (ActionableObject action in actionableObjects)
             {
-                action.actionBase.ExecuteAction(action.targetObject, incomingRay, action.transparencyIncrement);
+                action.actionBase.ExecuteAction(action.targetObject, incomingRay);
             }
         }
         catch (Exception e)

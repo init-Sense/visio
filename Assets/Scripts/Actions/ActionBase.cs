@@ -7,6 +7,6 @@ using UnityEngine;
 /// </summary>
 public abstract class ActionBase : ScriptableObject
 {
-    public abstract void ExecuteAction(GameObject targetObject, Ray incomingRay, float transparencyIncrement = 0f);
+    public abstract void ExecuteAction(GameObject targetObject, Ray incomingRay);
     public abstract void RevertAction(GameObject targetObject);
 }

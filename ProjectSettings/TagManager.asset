@@ -11,6 +11,7 @@ TagManager:
   - DisktangibleWall
   - DisktangibleFloatingArea
   - ActivatorFloatingArea
+  - Mirror
   layers:
   - Default
   - TransparentFX
