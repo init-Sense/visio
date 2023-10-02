@@ -16,8 +16,14 @@ public class FloatingAreaRayControllerPair
 
 public class ActivatorController : XRGrabInteractable
 {
-    [Tooltip("Assign the floating areas and their associated RayActivationController objects here.")] [SerializeField]
-    private List<FloatingAreaRayControllerPair> floatingAreaRayControllerPairs;
+
+    private enum ActivatorState
+    {
+        NotInsideTrigger,
+        InsideTrigger
+    }
+
+    private ActivatorState currentState = ActivatorState.NotInsideTrigger;
 
     [Tooltip("Adjust the rotation speed of the activator object.")]
     public float rotationSpeed = 50f;
@@ -32,13 +38,12 @@ public class ActivatorController : XRGrabInteractable
     public AudioClip rayActiveLoopClip;
 
     private AudioSource _audioSource;
-    
+
     private bool isAudioPlaying = false;
 
     private Material _activatorOriginalMaterial;
     private MeshRenderer _activatorRenderer;
     private Rigidbody _rigidbody;
-    private bool _isInsideTrigger = false;
     private Transform _targetTransform;
 
     private bool _isRayActive = false;
@@ -52,6 +57,20 @@ public class ActivatorController : XRGrabInteractable
     private RayActivationController currentRayActivationController;
 
     private Renderer _energyBallRenderer;
+
+    private Coroutine deactivateCoroutine;
+    private float rayDeactivationDelay = 1f; // 1 second delay, adjust as needed
+    private Transform _energyRingTurretTransform;
+    private Material _energyRingOriginalMaterial;
+    private Vector3 _energyRingOriginalPosition;
+    private Coroutine _energyRingAnimationCoroutine;
+    [Tooltip("The amplitude of the up and down motion for the EnergyRing.")]
+    public float energyRingFloatAmplitude = 0.5f; // default value
+    [Tooltip("The speed of the up and down motion for the EnergyRing.")]
+    public float energyRingFloatSpeed = 1.0f; // default value
+    [Tooltip("The rotation speed for the EnergyRing.")]
+    public float energyRingRotationSpeed = 60f; // default value in degrees per second
+
 
     protected override void Awake()
     {
@@ -86,13 +105,41 @@ public class ActivatorController : XRGrabInteractable
         {
             Debug.LogError("No child transform named 'EnergyBall' found under Activator.");
         }
+
+        _energyRingTurretTransform = transform.parent.Find("EnergyRing_Turret");
+
+        GameObject dynamicTurret = GameObject.Find("Dynamic Turret");
+        if (dynamicTurret != null)
+        {
+            _energyRingTurretTransform = dynamicTurret.transform.Find("EnergyRing_Turret");
+            if (_energyRingTurretTransform == null)
+            {
+                Debug.LogError("Ring not found inside Dynamic Turret!");
+            }
+            else
+            {
+                _energyRingOriginalPosition = _energyRingTurretTransform.position;
+                _energyRingOriginalMaterial = _energyRingTurretTransform.GetComponent<Renderer>().material;
+
+            }
+        }
+        else
+        {
+            Debug.LogError("Dynamic Turret not found!");
+        }
+
     }
 
     void FixedUpdate()
     {
-        if (_targetTransform == null || !_isInsideTrigger)
-            return;
+        if (currentState == ActivatorState.InsideTrigger)
+        {
+            HandleInsideTriggerState();
+        }
+    }
 
+    void HandleInsideTriggerState()
+    {
         if (_isRayActive && rayActiveLoopClip != null && !isAudioPlaying)
         {
             _audioSource.clip = rayActiveLoopClip;
@@ -105,105 +152,119 @@ public class ActivatorController : XRGrabInteractable
             isAudioPlaying = false;
         }
 
-        if (_isInsideTrigger)
-        {
-            // Float and rotate the activator towards the target transform.
-            transform.position = Vector3.Lerp(transform.position, _targetTransform.position,
-                Time.deltaTime * centeringSpeed);
-            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
-        }
+
+        // Float and rotate the activator towards the target transform.
+        transform.position = Vector3.MoveTowards(transform.position, _targetTransform.position, Time.deltaTime * centeringSpeed);
+        transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
 
         if (_rigidbody.useGravity)
         {
             Debug.Log("Gravity is enabled");
         }
+        else
+        {
+            Debug.Log("Gravity is disabled");
+        }
     }
+
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log("OnTriggerEnter called with collider: " + other.name);
-
-        // Find the correct RayActivationController based on the floating area
-        foreach (var pair in floatingAreaRayControllerPairs)
+        if (other.CompareTag("ActivatorFloatingArea"))
         {
-            if (pair.floatingArea == other)
-            {
-                currentRayActivationController = pair.rayActivationController;
-                _targetRenderer = pair.targetObject.GetComponent<MeshRenderer>();
-                _targetOriginalMaterial = _targetRenderer.material;
-                _targetRenderer.material = pair.targetGlowMaterial;
-                break;
-            }
-        }
+            // Search for the RayActivationController in the parent object
+            currentRayActivationController = other.transform.parent.GetComponent<RayActivationController>();
+            currentState = ActivatorState.InsideTrigger;
 
-        if (currentRayActivationController != null)
-        {
-            _isInsideTrigger = true;
-            _rigidbody.useGravity = false;
-            _rigidbody.velocity = Vector3.zero;
-            _rigidbody.angularVelocity = Vector3.zero;
-            
-            Debug.Log("RayActivationController found: " + currentRayActivationController.name);
-            
-            if (_energyBallRenderer != null)
+            if (currentRayActivationController != null)
             {
-                _energyBallRenderer.material = activatorGlowMaterial;
-            }
+                _rigidbody.useGravity = false;
+                _rigidbody.velocity = Vector3.zero;
+                _rigidbody.angularVelocity = Vector3.zero;
 
-            _targetTransform = other.transform.Find("Hovering Point");
-            if (_targetTransform == null)
+                if (_energyBallRenderer != null)
+                {
+                    _energyBallRenderer.material = activatorGlowMaterial;
+                }
+
+                _targetTransform = other.transform.Find("Hovering Point");
+                if (_targetTransform == null)
+                {
+                    Debug.LogError("No child transform named 'Hovering Point' found under ActivatorFloatingArea.");
+                }
+
+                currentRayActivationController.ActivateRaycasting();
+                _isRayActive = true;
+            }
+            else
             {
-                Debug.LogError("No child transform named 'Hovering Point' found under ActivatorFloatingArea.");
+                Debug.LogError("No RayActivationController found for the floating area.");
             }
 
-            currentRayActivationController.ActivateRaycasting();
-            _isRayActive = true;
-        }
-        else
-        {
-            Debug.LogError("No RayActivationController found for the floating area.");
+            if (_energyRingTurretTransform)
+            {
+                Renderer energyRingRenderer = _energyRingTurretTransform.GetComponent<Renderer>();
+                if (energyRingRenderer)
+                {
+                    energyRingRenderer.material = activatorGlowMaterial;
+                }
+                if (_energyRingAnimationCoroutine != null)
+                {
+                    StopCoroutine(_energyRingAnimationCoroutine);
+                }
+                _energyRingAnimationCoroutine = StartCoroutine(EnergyRingAnimation());
+            }
         }
     }
-
-    private float rayDeactivationDelay = 1f; // 1 second delay, adjust as needed
-
-    Coroutine deactivateCoroutine;
 
 
     void OnTriggerExit(Collider other)
     {
-        Debug.Log("OnTriggerExit called with collider: " + other.name);
-        
-        // Ensure it's the correct trigger that is exited
-        foreach (var pair in floatingAreaRayControllerPairs)
+        if (other.CompareTag("ActivatorFloatingArea"))
         {
-            if (pair.floatingArea == other)
+            Debug.Log("Exiting ActivatorFloatingArea, enabling gravity");
+
+            currentState = ActivatorState.NotInsideTrigger;
+
+            _rigidbody.useGravity = true;
+
+            if (_energyBallRenderer != null)
             {
-                Debug.Log("Exiting ActivatorFloatingArea, enabling gravity");
-                _isInsideTrigger = false;
-                _rigidbody.useGravity = true;
-                if (_energyBallRenderer != null)
-                {
-                    _energyBallRenderer.material = _activatorOriginalMaterial;
-                }
-
-                if (deactivateCoroutine != null)
-                {
-                    StopCoroutine(deactivateCoroutine);
-                }
-
-                deactivateCoroutine = StartCoroutine(DeactivateRayAfterDelay());
-                break;
+                _energyBallRenderer.material = _activatorOriginalMaterial;
             }
+
+            if (deactivateCoroutine != null)
+            {
+                StopCoroutine(deactivateCoroutine);
+            }
+
+            deactivateCoroutine = StartCoroutine(DeactivateRayAfterDelay());
+
+            if (_energyRingTurretTransform)
+            {
+                Renderer energyRingRenderer = _energyRingTurretTransform.GetComponent<Renderer>();
+                if (energyRingRenderer)
+                {
+                    energyRingRenderer.material = _energyRingOriginalMaterial;
+                }
+                if (_energyRingAnimationCoroutine != null)
+                {
+                    StopCoroutine(_energyRingAnimationCoroutine);
+                }
+                StartCoroutine(ReturnEnergyRingToOriginalPosition());
+
+            }
+
         }
     }
+
 
 
     private IEnumerator DeactivateRayAfterDelay()
     {
         yield return new WaitForSeconds(rayDeactivationDelay);
 
-        if (!_isInsideTrigger && _isRayActive)
+        if (currentState == ActivatorState.NotInsideTrigger && _isRayActive)
         {
             if (currentRayActivationController != null)
             {
@@ -233,6 +294,7 @@ public class ActivatorController : XRGrabInteractable
 
 
 
+
     protected override void OnSelectEntered(SelectEnterEventArgs args)
     {
         base.OnSelectEntered(args);
@@ -257,4 +319,38 @@ public class ActivatorController : XRGrabInteractable
 
         isSelectExitedCalled = true;
     }
+
+    private IEnumerator EnergyRingAnimation()
+    {
+        float elapsedTime = 0;
+        while (true)
+        {
+            // For up and down motion
+            float yOffset = energyRingFloatAmplitude * Mathf.Sin(energyRingFloatSpeed * elapsedTime);
+            Vector3 newPosition = _energyRingOriginalPosition + new Vector3(0, yOffset, 0);
+            _energyRingTurretTransform.position = newPosition;
+
+            // For rotation
+            _energyRingTurretTransform.Rotate(0, energyRingRotationSpeed * Time.deltaTime, 0);
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+    }
+
+    private IEnumerator ReturnEnergyRingToOriginalPosition()
+    {
+        float elapsedTime = 0;
+        float returnDuration = 2.0f;  // Set the time you'd like for the return in seconds. Adjust as needed.
+        Vector3 startingPosition = _energyRingTurretTransform.position;
+
+        while (elapsedTime < returnDuration)
+        {
+            _energyRingTurretTransform.position = Vector3.Lerp(startingPosition, _energyRingOriginalPosition, elapsedTime / returnDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        _energyRingTurretTransform.position = _energyRingOriginalPosition;
+    }
+
 }
