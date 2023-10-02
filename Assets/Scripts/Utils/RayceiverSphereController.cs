@@ -8,63 +8,92 @@ public class RayceiverSphereController : MonoBehaviour
 
     private MeshRenderer meshRenderer;
     private bool isActivated = false;
+    private bool isReceiverHit = false;
 
-    // Declare the rayActivationController variable
     private RayActivationController rayActivationController;
-    // Declare the rayProcessingController variable
     private RayProcessingController rayProcessingController;
 
     private Coroutine deactivationCoroutine;
     private bool activationInProgress = false;
 
+    private float deactivationCooldown = 0.5f; // Cooldown time in seconds
+    private float lastDeactivationTime;
+
+    private enum ReceiverState
+    {
+        Inactive,
+        Activating,
+        Active,
+        Deactivating
+    }
+
+    private ReceiverState currentState = ReceiverState.Inactive;
+
     private void Start()
     {
         meshRenderer = GetComponent<MeshRenderer>();
 
-        // Initialize the rayActivationController variable
         rayActivationController = FindObjectOfType<RayActivationController>();
-        // Initialize the rayProcessingController variable
         rayProcessingController = FindObjectOfType<RayProcessingController>();
     }
 
     private void Update()
     {
-        // Check ray from RayActivationController
         Ray rayActivation = new Ray(rayActivationController.raycastOrigin.position, rayActivationController.raycastOrigin.forward);
         RaycastHit hitActivation;
         bool hitActivationController = Physics.Raycast(rayActivation, out hitActivation, Mathf.Infinity, rayActivationController.raycastMask);
 
-        // Check ray from RayProcessingController
         Ray rayProcessing = new Ray(rayProcessingController.transform.position, rayProcessingController.transform.forward);
         RaycastHit hitProcessing;
         bool hitProcessingController = Physics.Raycast(rayProcessing, out hitProcessing, Mathf.Infinity, rayProcessingController.raycastMask);
 
         if (hitActivationController && hitActivation.collider.gameObject == gameObject)
         {
-            Activate();
+            isReceiverHit = true;
+            if (currentState == ReceiverState.Inactive || currentState == ReceiverState.Deactivating)
+            {
+                Activate();
+            }
         }
         else if (hitProcessingController && hitProcessing.collider.gameObject == gameObject)
         {
-            Activate();
+            isReceiverHit = true;
+            if (currentState == ReceiverState.Inactive || currentState == ReceiverState.Deactivating)
+            {
+                Activate();
+            }
         }
-        else if (!activationInProgress)
+        else
         {
-            DeactivateAfterDelay();
+            isReceiverHit = false;
+            if (!activationInProgress)
+            {
+                DeactivateAfterDelay();
+            }
         }
     }
 
     public void Activate()
     {
-        if (!isActivated)
+        if (currentState == ReceiverState.Inactive)
         {
             Debug.Log("Activating game objects");
+            currentState = ReceiverState.Activating;
             activationInProgress = true;
             foreach (GameObject go in gameObjectsToActivate)
             {
                 go.SetActive(true);
             }
+            currentState = ReceiverState.Active;
             isActivated = true;
             activationInProgress = false;
+        }
+        else if (currentState == ReceiverState.Deactivating)
+        {
+            StopCoroutine(deactivationCoroutine);
+            deactivationCoroutine = null;
+            currentState = ReceiverState.Active;
+            isActivated = true;
         }
         else
         {
@@ -74,14 +103,11 @@ public class RayceiverSphereController : MonoBehaviour
 
     public void Deactivate()
     {
-        if (isActivated)
+        if (currentState == ReceiverState.Active)
         {
             Debug.Log("Deactivating game objects");
-            foreach (GameObject go in gameObjectsToActivate)
-            {
-                go.SetActive(false);
-            }
-            isActivated = false;
+            currentState = ReceiverState.Deactivating;
+            deactivationCoroutine = StartCoroutine(DeactivationCoroutine());
         }
         else
         {
@@ -91,30 +117,22 @@ public class RayceiverSphereController : MonoBehaviour
 
     private void DeactivateAfterDelay()
     {
-        if (isActivated && deactivationCoroutine == null)
+        if (isActivated && !isReceiverHit && Time.time - lastDeactivationTime >= deactivationCooldown)
         {
-            deactivationCoroutine = StartCoroutine(DeactivationCoroutine());
+            lastDeactivationTime = Time.time;
+            Deactivate();
         }
     }
 
     private IEnumerator DeactivationCoroutine()
     {
-        yield return new WaitForSeconds(0.1f); // Adjust the delay duration as needed
-
-        // Check if the ray is still hitting the sphere
-        Ray rayActivation = new Ray(rayActivationController.raycastOrigin.position, rayActivationController.raycastOrigin.forward);
-        RaycastHit hitActivation;
-        bool hitActivationController = Physics.Raycast(rayActivation, out hitActivation, Mathf.Infinity, rayActivationController.raycastMask);
-
-        Ray rayProcessing = new Ray(rayProcessingController.transform.position, rayProcessingController.transform.forward);
-        RaycastHit hitProcessing;
-        bool hitProcessingController = Physics.Raycast(rayProcessing, out hitProcessing, Mathf.Infinity, rayProcessingController.raycastMask);
-
-        if (!hitActivationController && !hitProcessingController)
+        yield return new WaitForSeconds(deactivationCooldown);
+        foreach (GameObject go in gameObjectsToActivate)
         {
-            Deactivate();
+            go.SetActive(false);
         }
-
+        currentState = ReceiverState.Inactive;
+        isActivated = false;
         deactivationCoroutine = null;
     }
 }
