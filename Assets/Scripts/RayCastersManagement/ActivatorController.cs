@@ -125,7 +125,7 @@ public class ActivatorController : XRGrabInteractable
         }
         else
         {
-            Debug.LogError("Dynamic Turret not found!");
+            Debug.Log("Dynamic Turret still not found!");
         }
     }
 
