@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
+/// <summary>
+/// A centralized script that controls all the portals in the scene.
+/// </summary>
 public class PortalController : MonoBehaviour
 {
     [System.Serializable]

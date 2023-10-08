@@ -1,17 +1,20 @@
 using UnityEngine;
 
+/// <summary>
+/// This script is used to generate a ray and reflect it using the RayReflectionHandler script.
+/// </summary>
 public class RayActivationController : MonoBehaviour
 {
-    [Tooltip("Raycast origin.")]
-    public Transform raycastOrigin;
-    [Tooltip("Raycast mask.")]
+    [Tooltip("Raycast origin.")] public Transform raycastOrigin;
+
+    [Tooltip("Raycast mask. If unsure, set it to Puzzle Ray.")]
     public LayerMask raycastMask;
-    [Tooltip("Reference to the ray processing controller.")]
-    public RayProcessingController rayProcessingController;
 
     private LineRenderer _lineRenderer;
 
     public Material lineMaterial;
+
+    private RayReflectionHandler CurrentReflectionHandler { get; set; }
 
     void Awake()
     {
@@ -27,40 +30,24 @@ public class RayActivationController : MonoBehaviour
 
     public void ActivateRaycasting()
     {
-        Debug.Log("ActivateRaycasting called");
         _lineRenderer.enabled = true;
     }
 
     public void DeactivateRaycasting()
     {
-        Debug.Log("DeactivateRaycasting called");
         _lineRenderer.enabled = false;
-        rayProcessingController.ResetRayHit();
-
-
     }
 
     void FixedUpdate()
     {
         if (_lineRenderer.enabled)
         {
-            bool hitSomething = Raycast(raycastOrigin, _lineRenderer, raycastMask);
-            if (!hitSomething)
-            {
-                rayProcessingController.DestroyReflectionLine();
-            }
+            Raycast(raycastOrigin, _lineRenderer, raycastMask);
         }
     }
 
-
-    private float resetCooldown = 0.5f; // Time in seconds before resetting the ray hit
-    private float lastHitTime;
-
-    private bool reflectionDestroyedThisFrame = false;
-
     bool Raycast(Transform raycastOrigin, LineRenderer lineRenderer, LayerMask raycastMask)
     {
-        Debug.Log("Raycast called");
         Ray ray = new Ray(raycastOrigin.position, raycastOrigin.forward);
         RaycastHit hit;
         bool hitSomething = Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask);
@@ -71,30 +58,32 @@ public class RayActivationController : MonoBehaviour
         {
             lineRenderer.SetPosition(1, hit.point);
 
-            RayProcessingController hitReceiver = hit.collider.gameObject.GetComponent<RayProcessingController>();
-            if (hitReceiver != null)
+            RayReflectionHandler hitReflectionHandler = hit.collider.gameObject.GetComponent<RayReflectionHandler>();
+            if (hitReflectionHandler != null)
             {
-                hitReceiver.ProcessRayHit(hit.point, ray, hit.normal);
+                CurrentReflectionHandler = hitReflectionHandler;
+                CurrentReflectionHandler.Initialize(hit.point, ray.direction, hit.normal);
             }
-
-            // If the ray hits an object with the "Exit" tag or exits the reflective surface
-            if (hit.collider.CompareTag("Exit") || hitReceiver == null)
+            else
             {
-                rayProcessingController.DestroyReflectionLine();
+                if (CurrentReflectionHandler != null)
+                {
+                    CurrentReflectionHandler.DestroyReflectionLine();
+                    CurrentReflectionHandler = null;
+                }
             }
         }
         else
         {
-            lineRenderer.SetPosition(1, raycastOrigin.position + raycastOrigin.forward * 1000);
-            rayProcessingController.DestroyReflectionLine();
+            lineRenderer.SetPosition(1, raycastOrigin.position + ray.direction * 15f);
+
+            if (CurrentReflectionHandler != null)
+            {
+                CurrentReflectionHandler.DestroyReflectionLine();
+                CurrentReflectionHandler = null;
+            }
         }
 
         return hitSomething;
-    }
-
-
-    void LateUpdate()
-    {
-        reflectionDestroyedThisFrame = false;
     }
 }

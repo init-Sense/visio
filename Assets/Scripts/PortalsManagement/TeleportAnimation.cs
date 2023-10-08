@@ -2,14 +2,20 @@
 
 public class TeleportAnimation : MonoBehaviour
 {
+    [Tooltip("Teleport renderer. This will change material when the teleport is active.")]
     public GameObject teleportWave;
-    public GameObject teleportDisk;
+
+    [Tooltip("The material which will be used when the teleport is active.")]
     public Material activeMaterial;
+
+    [Tooltip("The material which will be used when the teleport is inactive.")]
     public Material inactiveMaterial;
+
+    [Tooltip("You can also determine if a teleport starts as active or inactive.")]
     public bool isTeleportActive = false;
 
-    private Renderer teleportWaveRenderer;
-    private Renderer teleportDiskRenderer;
+    private Renderer _teleportWaveRenderer;
+    private Renderer _teleportDiskRenderer;
 
     void Start()
     {
@@ -18,19 +24,10 @@ public class TeleportAnimation : MonoBehaviour
             Debug.LogError("Teleport wave is not set");
         }
 
-        teleportWaveRenderer = teleportWave.GetComponent<Renderer>();
-        if (teleportWaveRenderer == null)
+        _teleportWaveRenderer = teleportWave.GetComponent<Renderer>();
+        if (_teleportWaveRenderer == null)
         {
             Debug.LogError("No Renderer found on the teleport wave object.");
-        }
-
-        if (teleportDisk != null)
-        {
-            teleportDiskRenderer = teleportDisk.GetComponent<Renderer>();
-            if (teleportDiskRenderer == null)
-            {
-                Debug.LogError("No Renderer found on the teleport disk object.");
-            }
         }
     }
 
@@ -42,11 +39,11 @@ public class TeleportAnimation : MonoBehaviour
     private void UpdateTeleportMaterials()
     {
         Material currentMaterial = isTeleportActive ? activeMaterial : inactiveMaterial;
-        teleportWaveRenderer.material = currentMaterial;
+        _teleportWaveRenderer.material = currentMaterial;
 
-        if (teleportDiskRenderer != null)
+        if (_teleportDiskRenderer != null)
         {
-            teleportDiskRenderer.material = currentMaterial;
+            _teleportDiskRenderer.material = currentMaterial;
         }
     }
 

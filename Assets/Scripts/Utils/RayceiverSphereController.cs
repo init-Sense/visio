@@ -1,138 +1,97 @@
 using UnityEngine;
-using System.Collections;
 
+/// <summary>
+/// This script is used to activate and deactivate GameObjects when hit by a ray.
+/// </summary>
 public class RayceiverSphereController : MonoBehaviour
 {
-    [Tooltip("List of game objects to activate when hit by a ray.")]
+    [Tooltip("List of GameObjects to activate when hit by the ray.")]
     public GameObject[] gameObjectsToActivate;
 
-    private MeshRenderer meshRenderer;
-    private bool isActivated = false;
-    private bool isReceiverHit = false;
+    [Tooltip("List of GameObjects to deactivate when hit by the ray.")]
+    public GameObject[] gameObjectsToDeactivate;
 
-    private RayActivationController rayActivationController;
-    private RayProcessingController rayProcessingController;
-
-    private Coroutine deactivationCoroutine;
-    private bool activationInProgress = false;
-
-    private float deactivationCooldown = 0.5f; // Cooldown time in seconds
-    private float lastDeactivationTime;
-
-    private enum ReceiverState
+    [Tooltip("Layer mask to specify which layers the raycast should hit.")]
+    public LayerMask raycastLayerMask;
+    
+    private bool _isActivated = false;
+    
+   void Update()
     {
-        Inactive,
-        Activating,
-        Active,
-        Deactivating
-    }
-
-    private ReceiverState currentState = ReceiverState.Inactive;
-
-    private void Start()
-    {
-        meshRenderer = GetComponent<MeshRenderer>();
-
-        rayActivationController = FindObjectOfType<RayActivationController>();
-        rayProcessingController = FindObjectOfType<RayProcessingController>();
-    }
-
-    private void Update()
-    {
-        Ray rayActivation = new Ray(rayActivationController.raycastOrigin.position, rayActivationController.raycastOrigin.forward);
-        RaycastHit hitActivation;
-        bool hitActivationController = Physics.Raycast(rayActivation, out hitActivation, Mathf.Infinity, rayActivationController.raycastMask);
-
-        Ray rayProcessing = new Ray(rayProcessingController.transform.position, rayProcessingController.transform.forward);
-        RaycastHit hitProcessing;
-        bool hitProcessingController = Physics.Raycast(rayProcessing, out hitProcessing, Mathf.Infinity, rayProcessingController.raycastMask);
-
-        if (hitActivationController && hitActivation.collider.gameObject == gameObject)
+        // Check if this object is hit by the ray
+        if (IsHitByRay())
         {
-            isReceiverHit = true;
-            if (currentState == ReceiverState.Inactive || currentState == ReceiverState.Deactivating)
-            {
-                Activate();
-            }
-        }
-        else if (hitProcessingController && hitProcessing.collider.gameObject == gameObject)
-        {
-            isReceiverHit = true;
-            if (currentState == ReceiverState.Inactive || currentState == ReceiverState.Deactivating)
-            {
-                Activate();
-            }
+            ActivateGameObjects();
+            DeactivateGameObjects();
         }
         else
         {
-            isReceiverHit = false;
-            if (!activationInProgress)
-            {
-                DeactivateAfterDelay();
-            }
+            ResetGameObjects();
         }
     }
 
-    public void Activate()
+   bool IsHitByRay()
+   {
+       LineRenderer[] lineRenderers = FindObjectsOfType<LineRenderer>();
+
+       foreach (LineRenderer lineRenderer in lineRenderers)
+       {
+           if (lineRenderer.enabled && (lineRenderer.gameObject.name == "ReflectionLine" || lineRenderer.gameObject.name == "Ray Caster"))
+           {
+               Vector3 startPoint = lineRenderer.GetPosition(0);
+               Vector3 direction = (lineRenderer.GetPosition(1) - startPoint).normalized;
+
+               if (Physics.Raycast(startPoint, direction, out RaycastHit hit, Vector3.Distance(startPoint, lineRenderer.GetPosition(1)), raycastLayerMask))
+               {
+                   if (hit.collider.gameObject == this.gameObject)
+                   {
+                       return true;
+                   }
+               }
+           }
+       }
+
+       return false;
+   }
+
+
+
+    void ActivateGameObjects()
     {
-        if (currentState == ReceiverState.Inactive)
+        if (!_isActivated)
         {
-            Debug.Log("Activating game objects");
-            currentState = ReceiverState.Activating;
-            activationInProgress = true;
             foreach (GameObject go in gameObjectsToActivate)
             {
                 go.SetActive(true);
             }
-            currentState = ReceiverState.Active;
-            isActivated = true;
-            activationInProgress = false;
-        }
-        else if (currentState == ReceiverState.Deactivating)
-        {
-            StopCoroutine(deactivationCoroutine);
-            deactivationCoroutine = null;
-            currentState = ReceiverState.Active;
-            isActivated = true;
-        }
-        else
-        {
-            Debug.Log("Game objects are already active");
+
+            _isActivated = true;
         }
     }
 
-    public void Deactivate()
+    void DeactivateGameObjects()
     {
-        if (currentState == ReceiverState.Active)
-        {
-            Debug.Log("Deactivating game objects");
-            currentState = ReceiverState.Deactivating;
-            deactivationCoroutine = StartCoroutine(DeactivationCoroutine());
-        }
-        else
-        {
-            Debug.Log("Game objects are already inactive");
-        }
-    }
-
-    private void DeactivateAfterDelay()
-    {
-        if (isActivated && !isReceiverHit && Time.time - lastDeactivationTime >= deactivationCooldown)
-        {
-            lastDeactivationTime = Time.time;
-            Deactivate();
-        }
-    }
-
-    private IEnumerator DeactivationCoroutine()
-    {
-        yield return new WaitForSeconds(deactivationCooldown);
-        foreach (GameObject go in gameObjectsToActivate)
+        foreach (GameObject go in gameObjectsToDeactivate)
         {
             go.SetActive(false);
         }
-        currentState = ReceiverState.Inactive;
-        isActivated = false;
-        deactivationCoroutine = null;
+    }
+
+    void ResetGameObjects()
+    {
+        if (_isActivated)
+        {
+            foreach (GameObject go in gameObjectsToActivate)
+            {
+                go.SetActive(false);
+            }
+
+            foreach (GameObject go in gameObjectsToDeactivate)
+            {
+                go.SetActive(true);
+            }
+
+            _isActivated = false;
+        }
     }
 }

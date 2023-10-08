@@ -16,7 +16,6 @@ public class FloatingAreaRayControllerPair
 
 public class ActivatorController : XRGrabInteractable
 {
-
     private enum ActivatorState
     {
         NotInsideTrigger,
@@ -47,7 +46,6 @@ public class ActivatorController : XRGrabInteractable
     private Transform _targetTransform;
 
     private bool _isRayActive = false;
-    public AreaController areaController;
 
     private bool isSelectExitedCalled = false;
 
@@ -64,10 +62,13 @@ public class ActivatorController : XRGrabInteractable
     private Material _energyRingOriginalMaterial;
     private Vector3 _energyRingOriginalPosition;
     private Coroutine _energyRingAnimationCoroutine;
+
     [Tooltip("The amplitude of the up and down motion for the EnergyRing.")]
     public float energyRingFloatAmplitude = 0.5f; // default value
+
     [Tooltip("The speed of the up and down motion for the EnergyRing.")]
     public float energyRingFloatSpeed = 1.0f; // default value
+
     [Tooltip("The rotation speed for the EnergyRing.")]
     public float energyRingRotationSpeed = 60f; // default value in degrees per second
 
@@ -120,14 +121,12 @@ public class ActivatorController : XRGrabInteractable
             {
                 _energyRingOriginalPosition = _energyRingTurretTransform.position;
                 _energyRingOriginalMaterial = _energyRingTurretTransform.GetComponent<Renderer>().material;
-
             }
         }
         else
         {
             Debug.LogError("Dynamic Turret not found!");
         }
-
     }
 
     void FixedUpdate()
@@ -154,8 +153,13 @@ public class ActivatorController : XRGrabInteractable
 
 
         // Float and rotate the activator towards the target transform.
-        transform.position = Vector3.MoveTowards(transform.position, _targetTransform.position, Time.deltaTime * centeringSpeed);
-        transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+        if (_targetTransform != null)
+        {
+            transform.position = Vector3.Lerp(transform.position, _targetTransform.position,
+                Time.deltaTime * centeringSpeed);
+            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+        }
+
 
         if (_rigidbody.useGravity)
         {
@@ -208,10 +212,12 @@ public class ActivatorController : XRGrabInteractable
                 {
                     energyRingRenderer.material = activatorGlowMaterial;
                 }
+
                 if (_energyRingAnimationCoroutine != null)
                 {
                     StopCoroutine(_energyRingAnimationCoroutine);
                 }
+
                 _energyRingAnimationCoroutine = StartCoroutine(EnergyRingAnimation());
             }
         }
@@ -247,17 +253,16 @@ public class ActivatorController : XRGrabInteractable
                 {
                     energyRingRenderer.material = _energyRingOriginalMaterial;
                 }
+
                 if (_energyRingAnimationCoroutine != null)
                 {
                     StopCoroutine(_energyRingAnimationCoroutine);
                 }
+
                 StartCoroutine(ReturnEnergyRingToOriginalPosition());
-
             }
-
         }
     }
-
 
 
     private IEnumerator DeactivateRayAfterDelay()
@@ -269,12 +274,12 @@ public class ActivatorController : XRGrabInteractable
             if (currentRayActivationController != null)
             {
                 currentRayActivationController.DeactivateRaycasting();
-                currentRayActivationController.rayProcessingController.ResetRayHit(); // Explicitly reset ray hit
             }
             else
             {
                 Debug.LogError("currentRayActivationController is null.");
             }
+
             _isRayActive = false;
         }
 
@@ -291,8 +296,6 @@ public class ActivatorController : XRGrabInteractable
             isAudioPlaying = false;
         }
     }
-
-
 
 
     protected override void OnSelectEntered(SelectEnterEventArgs args)
@@ -341,16 +344,17 @@ public class ActivatorController : XRGrabInteractable
     private IEnumerator ReturnEnergyRingToOriginalPosition()
     {
         float elapsedTime = 0;
-        float returnDuration = 2.0f;  // Set the time you'd like for the return in seconds. Adjust as needed.
+        float returnDuration = 2.0f; // Set the time you'd like for the return in seconds. Adjust as needed.
         Vector3 startingPosition = _energyRingTurretTransform.position;
 
         while (elapsedTime < returnDuration)
         {
-            _energyRingTurretTransform.position = Vector3.Lerp(startingPosition, _energyRingOriginalPosition, elapsedTime / returnDuration);
+            _energyRingTurretTransform.position = Vector3.Lerp(startingPosition, _energyRingOriginalPosition,
+                elapsedTime / returnDuration);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+
         _energyRingTurretTransform.position = _energyRingOriginalPosition;
     }
-
 }

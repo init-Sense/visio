@@ -2,7 +2,7 @@
 
 public class Checkpoint : MonoBehaviour
 {
-    public RespawnController respawnScript; // Reference to the RespawnObjects script
+    public RespawnController respawnScript;
 
     void OnTriggerEnter(Collider other)
     {

@@ -91,7 +91,6 @@ public class DiskTangibleController : XRGrabInteractable
         {
             transform.position = Vector3.Lerp(transform.position, hoverPoint.position, Time.deltaTime);
         
-            // Make the disk's X direction face the Hover Point's X direction by aligning the disk's Z-axis with the Hover Point's Y-axis.
             Quaternion targetRotation = Quaternion.LookRotation(hoverPoint.up, hoverPoint.right);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 5f);
         }
@@ -107,7 +106,6 @@ public class DiskTangibleController : XRGrabInteractable
             _rigidbody.velocity = Vector3.zero;
             _rigidbody.angularVelocity = Vector3.zero;
 
-            // Search for a Hovering Point within the collided object.
             Transform foundHoverPoint = other.transform.Find("Hovering Point");
             if (foundHoverPoint)
             {

@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// A simple rotation script, mainly for the energy ball or objects in the landscape that need to rotate.
+/// </summary>
 public class RandomRotation : MonoBehaviour
 {
     public float rotationSpeed = 20f;
     public Vector3 rotationAxis = Vector3.up;
 
-    // Update is called once per frame
     private void Update()
     {
-        // Rotate the object around the given axis by rotationSpeed degrees per second
         transform.Rotate(rotationAxis, rotationSpeed * Time.deltaTime);
     }
 }
