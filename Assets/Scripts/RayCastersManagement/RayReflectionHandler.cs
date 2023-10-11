@@ -36,7 +36,7 @@ public class RayReflectionHandler : MonoBehaviour
         Ray ray = new Ray(origin, reflectedDirection);
         RaycastHit hit;
 
-        Vector3 endPoint = origin + reflectedDirection * 10;
+        Vector3 endPoint = origin + reflectedDirection * 20;
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, raycastMask))
         {
@@ -45,7 +45,7 @@ public class RayReflectionHandler : MonoBehaviour
             RayReflectionHandler reflectionHandler = hit.collider.gameObject.GetComponent<RayReflectionHandler>();
             if (reflectionHandler != null)
             {
-                reflectionHandler.Initialize(hit.point, direction, hit.normal);
+                reflectionHandler.Initialize(hit.point, reflectedDirection, hit.normal); 
             }
 
             Renderer hitRenderer = hit.collider.gameObject.GetComponent<Renderer>();
@@ -54,6 +54,7 @@ public class RayReflectionHandler : MonoBehaviour
                 ReflectRay(hit.point, reflectedDirection, hit.normal, reflectionCount + 1);
             }
         }
+
 
 
         if (_currentReflectionLine != null)
