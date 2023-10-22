@@ -351,6 +351,10 @@ PrefabInstance:
       propertyPath: energyRingFloatAmplitude
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall 2
@@ -431,6 +435,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 3347605079729629998, guid: e7fdd265ef257334da420fba4d1928cc, type: 3}
   m_PrefabInstance: {fileID: 31808757}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &37067598 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 747827093498009747, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+  m_PrefabInstance: {fileID: 2129923510}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907b3b52ec8a41aea265ce777397771f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!135 &38514593 stripped
 SphereCollider:
   m_CorrespondingSourceObject: {fileID: 4156027601223673411, guid: 27081019a7346924c99e1fbcd8a46fe2, type: 3}
@@ -2362,6 +2377,11 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8583748701387925025, guid: 2fdbcbd634ce3004eae73c7bd7ea171e, type: 3}
   m_PrefabInstance: {fileID: 2007216973}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &294073689 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5925631692190558158, guid: 00015602301726e47b20d64d84876257, type: 3}
+  m_PrefabInstance: {fileID: 422932911}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &303822196
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2539,6 +2559,14 @@ PrefabInstance:
       propertyPath: floatingAreaRayControllerPairs.Array.data[0].rayActivationController
       value: 
       objectReference: {fileID: 1969304675}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall
@@ -2616,6 +2644,10 @@ PrefabInstance:
     - target: {fileID: 6143368411325779538, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: energyRingFloatAmplitude
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
@@ -3273,6 +3305,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1626068391843658685, guid: 00015602301726e47b20d64d84876257, type: 3}
       insertIndex: -1
       addedObject: {fileID: 649238579}
+    - targetCorrespondingSourceObject: {fileID: 5925631692190558158, guid: 00015602301726e47b20d64d84876257, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2055326421}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 3583885995309802830, guid: 00015602301726e47b20d64d84876257, type: 3}
       insertIndex: -1
@@ -5222,6 +5257,10 @@ PrefabInstance:
       propertyPath: m_Convex
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall 1
@@ -6132,6 +6171,10 @@ PrefabInstance:
       propertyPath: m_Convex
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall 2
@@ -6424,6 +6467,9 @@ MonoBehaviour:
   - portal: {fileID: 1330127896}
     destination: {fileID: 1815131377}
     teleportAnimation: {fileID: 216639363}
+  - portal: {fileID: 37067598}
+    destination: {fileID: 2055326422}
+    teleportAnimation: {fileID: 216639363}
 --- !u!4 &909499434
 Transform:
   m_ObjectHideFlags: 0
@@ -6628,6 +6674,10 @@ PrefabInstance:
       propertyPath: m_Convex
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall
@@ -6799,6 +6849,10 @@ PrefabInstance:
     - target: {fileID: 6143368411325779538, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: energyRingFloatAmplitude
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
@@ -7530,6 +7584,10 @@ PrefabInstance:
       propertyPath: floatingAreaRayControllerPairs.Array.data[0].rayActivationController
       value: 
       objectReference: {fileID: 1759140225}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall
@@ -7729,6 +7787,10 @@ PrefabInstance:
       propertyPath: floatingAreaRayControllerPairs.Array.data[0].rayActivationController
       value: 
       objectReference: {fileID: 883687445}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall
@@ -8428,6 +8490,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 407325931}
     m_Modifications:
+    - target: {fileID: 1622182316608301553, guid: dae1fd7c4d055aa4e8e3ca2fb917e921, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1622182316608301553, guid: dae1fd7c4d055aa4e8e3ca2fb917e921, type: 3}
+      propertyPath: m_IncludeLayers.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 1910487395265450691, guid: dae1fd7c4d055aa4e8e3ca2fb917e921, type: 3}
       propertyPath: m_Name
       value: Intangible Wall
@@ -9632,6 +9702,10 @@ PrefabInstance:
       propertyPath: energyRingFloatAmplitude
       value: 0.1
       objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall 1
@@ -10253,6 +10327,10 @@ PrefabInstance:
     - target: {fileID: 6143368411325779538, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: energyRingFloatAmplitude
       value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
@@ -10950,6 +11028,10 @@ PrefabInstance:
     - target: {fileID: 4004904049330413365, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: -0.233
+      objectReference: {fileID: 0}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
@@ -13821,6 +13903,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: -876546973899608171, guid: f3d8be85577c8054e8628493a12e3ef0, type: 3}
+    - target: {fileID: 7919953347709592328, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8237236700816443447, guid: 675fc5fff439718428af1b780fdc56fd, type: 3}
       propertyPath: m_Name
       value: EnergyBall
@@ -14898,6 +14984,105 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1001 &2055326420
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 294073689}
+    m_Modifications:
+    - target: {fileID: 407114102655712352, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_RootOrder
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.42
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.94
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -8.44
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9807481
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.008647154
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.19508228
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.0011835499
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -0.945
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -0.003
+      objectReference: {fileID: 0}
+    - target: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0.326
+      objectReference: {fileID: 0}
+    - target: {fileID: 5791671935714310780, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7780215681746786736, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: activeMaterial
+      value: 
+      objectReference: {fileID: -876546973899608171, guid: 98a14c3ec6147584197c0e24145e7804, type: 3}
+    - target: {fileID: 7780215681746786736, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: otherGameObject
+      value: 
+      objectReference: {fileID: 4944649049189235772, guid: 00015602301726e47b20d64d84876257, type: 3}
+    - target: {fileID: 7780215681746786736, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: inactiveMaterial
+      value: 
+      objectReference: {fileID: 2100000, guid: 94eebd9d324eddd49be6e843f56d7ec0, type: 2}
+    - target: {fileID: 7780215681746786736, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: isTeleportActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8099055871069460343, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_Name
+      value: Teleport_DESTINATION_02 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 8956247369884254199, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+--- !u!4 &2055326421 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4979742803791967625, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+  m_PrefabInstance: {fileID: 2055326420}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2055326422 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5513122810026397320, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+  m_PrefabInstance: {fileID: 2055326420}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2080181597
 GameObject:
   m_ObjectHideFlags: 0
@@ -15192,6 +15377,10 @@ PrefabInstance:
       propertyPath: inactiveMaterial
       value: 
       objectReference: {fileID: 2100000, guid: 7095bbf67c8069448a5131a144a21d04, type: 2}
+    - target: {fileID: 7780215681746786736, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
+      propertyPath: isTeleportActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8099055871069460343, guid: 4af96c05422cd934398fc5366d4dc7f0, type: 3}
       propertyPath: m_Name
       value: Teleport

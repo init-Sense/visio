@@ -57,20 +57,20 @@ public class ActivatorController : XRGrabInteractable
     private Renderer _energyBallRenderer;
 
     private Coroutine deactivateCoroutine;
-    private float rayDeactivationDelay = 1f; // 1 second delay, adjust as needed
+    private float rayDeactivationDelay = 1f; 
     private Transform _energyRingTurretTransform;
     private Material _energyRingOriginalMaterial;
     private Vector3 _energyRingOriginalPosition;
     private Coroutine _energyRingAnimationCoroutine;
 
     [Tooltip("The amplitude of the up and down motion for the EnergyRing.")]
-    public float energyRingFloatAmplitude = 0.5f; // default value
+    public float energyRingFloatAmplitude = 0.5f;
 
     [Tooltip("The speed of the up and down motion for the EnergyRing.")]
-    public float energyRingFloatSpeed = 1.0f; // default value
+    public float energyRingFloatSpeed = 1.0f;
 
     [Tooltip("The rotation speed for the EnergyRing.")]
-    public float energyRingRotationSpeed = 60f; // default value in degrees per second
+    public float energyRingRotationSpeed = 60f;
 
 
     protected override void Awake()
@@ -90,8 +90,8 @@ public class ActivatorController : XRGrabInteractable
 
         _audioSource = gameObject.AddComponent<AudioSource>();
         _audioSource.loop = true;
-        _audioSource.spatialBlend = 1.0f; // Make the sound effects source positional
-        _audioSource.transform.position = transform.position; // Set the position to the center of the activator
+        _audioSource.spatialBlend = 1.0f;
+        _audioSource.transform.position = transform.position;
 
         Transform energyBallTransform = transform.Find("EnergyBall");
         if (energyBallTransform != null)
@@ -344,7 +344,7 @@ public class ActivatorController : XRGrabInteractable
     private IEnumerator ReturnEnergyRingToOriginalPosition()
     {
         float elapsedTime = 0;
-        float returnDuration = 2.0f; // Set the time you'd like for the return in seconds. Adjust as needed.
+        float returnDuration = 2.0f;
         Vector3 startingPosition = _energyRingTurretTransform.position;
 
         while (elapsedTime < returnDuration)
